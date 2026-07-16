@@ -1,6 +1,6 @@
 # Portfolio Site: Iteration Roadmap
 
-Handover document for iterating on `katie-morrison-portfolio.html`. Written to be handed to a model (e.g. Opus) or a developer with no prior context.
+Handover document for iterating on `index.html` (kmorrison.dev). Written to be handed to a model (e.g. Opus) or a developer with no prior context.
 
 ---
 
@@ -21,7 +21,7 @@ Handover document for iterating on `katie-morrison-portfolio.html`. Written to b
 
 Everything here needs input from Katie. Slot content in without changing structure.
 
-1. **Photo.** DONE: hero photo in place as `katie.webp` (880x1100, 4:5) with `katie.jpg` fallback, EXIF stripped, `fetchpriority="high"`, alt text with no employer reference. Source file is `BINADW KM 7.jpg` (5371x3581) if recrops are ever needed.
+1. **Photo.** DONE: hero photo in place as `katie.webp` (800x800 square) with `katie.jpg` fallback, EXIF stripped, `fetchpriority="high"`, alt text with no employer reference. Source file is `assets/source/BINADW KM 7.jpg` (5371x3581) if recrops are ever needed.
 2. **Personal projects.** Replace the two dashed `.fun-card` placeholders with real content: what it is, what it does, what made it fun, plus a link or screenshot if shareable. Remove the dashed border once real (it signals "placeholder").
 3. **Case study.** Replace the drafted Claude + Obsidian article in the `<details class="post">` body with Katie's own write-up. Check it for identifying details before publishing.
 4. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
@@ -41,9 +41,9 @@ Everything here needs input from Katie. Slot content in without changing structu
 ## Phase 3: Conference readiness (do before the conference)
 
 1. **Metadata for sharing.** DONE: canonical, Open Graph (including `og:image` at 1200x630), Twitter `summary_large_image` card, JSON-LD `Person` schema and an inline SVG "KM" favicon, all pointing at `https://kmorrison.dev/`.
-2. **Hosting.** Domain is `kmorrison.dev`, already on Netlify serving the old (broken) portfolio. A ready-to-deploy `netlify-deploy/` folder exists (index.html, katie.webp, katie.jpg, og-image.jpg): drag it into the existing Netlify site's Deploys tab, confirm HTTPS and that the apex resolves. Note: `.dev` is HSTS-preloaded, so HTTPS is mandatory (Netlify handles this).
-3. **QR code.** DONE: generated for `https://kmorrison.dev/` in two colourways (ink-on-cream and green-on-cream), each as SVG and high-res PNG, decode-verified. Note: an inverted (cream-on-green) version was tested and failed to decode; keep QR codes dark-on-light. Remaining: test scan distance from a printed A6 before the conference.
-4. **Performance pass.** Target Lighthouse performance ≥ 95 on mobile: `font-display: swap` is already set via Google Fonts; consider self-hosting the two fonts as woff2 subsets to remove the third-party request; compress the photo; confirm total page weight under ~500 KB.
+2. **Hosting.** DONE: this GitHub repository is linked to Netlify and publishes to `kmorrison.dev` on every push to `main`. Rollback via Netlify's Deploys tab (publish an older deploy). Note: `.dev` is HSTS-preloaded, so HTTPS is mandatory (Netlify handles this).
+3. **QR code.** DONE: generated for `https://kmorrison.dev/` in two colourways (ink-on-cream and green-on-cream) in `assets/`, each as SVG and high-res PNG, decode-verified. An inverted (cream-on-green) version was tested and failed to decode; keep QR codes dark-on-light. Remaining: test scan distance from a printed A6 before the conference.
+4. **Performance pass.** Target Lighthouse performance ≥ 95 on mobile: `font-display: swap` is already set via Google Fonts; consider self-hosting the two fonts as woff2 subsets to remove the third-party request; total page weight should stay under ~500 KB.
 5. **Analytics (optional, privacy-first).** If Katie wants to know whether conference scans convert, add a lightweight privacy-respecting counter (e.g. Plausible or GoatCounter). No cookies, no consent banner needed.
 
 **Acceptance:** live URL + QR code scan to a page that loads in under 2 seconds on throttled 4G.
@@ -69,4 +69,7 @@ Everything here needs input from Katie. Slot content in without changing structu
 
 - The file is deliberately dependency-free: no frameworks, no build step. Keep it that way through Phase 4.
 - Katie's browser did not apply CSS `aspect-ratio` on the hero image (the height attribute rendered literally, producing a stretched crop). Avoid `aspect-ratio` on replaced elements; crop images to their intended ratio at the file level instead and use `height:auto`.
-- Test at 360px, 768px and 1200px widths; t
+- A truncated copy of `index.html` once shipped to production (file cut mid-body, losing the contact section and footer). After any copy, sync or deploy, verify the file ends with `</html>` before calling it done.
+- Test at 360px, 768px and 1200px widths; the audience scans this on phones on conference wifi.
+- After every iteration, re-run the three checks: no em dashes in copy, no US spellings in copy (CSS keywords excepted), no employer identifiers anywhere.
+- When in doubt on tone, cut words rather than add them.
