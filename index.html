@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katie Morrison · Operations &amp; Technology</title>
+<meta name="description" content="Katie Morrison helps a small charity work smarter than its size. Operations, technology and AI in the not-for-profit sector.">
+<link rel="canonical" href="https://kmorrison.dev/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kmorrison.dev/">
+<meta property="og:title" content="Katie Morrison · Operations &amp; Technology">
+<meta property="og:description" content="I help a small charity work smarter than its size. Operations, technology and AI in the not-for-profit sector.">
+<meta property="og:image" content="https://kmorrison.dev/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Katie Morrison · Operations &amp; Technology">
+<meta name="twitter:description" content="I help a small charity work smarter than its size. Operations, technology and AI in the not-for-profit sector.">
+<meta name="twitter:image" content="https://kmorrison.dev/og-image.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF5EE'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23B4552D' text-anchor='middle'%3EKM%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Katie Morrison",
+  "url": "https://kmorrison.dev/",
+  "sameAs": ["https://www.linkedin.com/in/katherine-a-morrison/"],
+  "description": "Operations and technology in the not-for-profit sector. Systems thinking, vendor orchestration, AI adoption and clear writing."
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF5EE;
+    --cream-deep:#F3EADF;
+    --ink:#2E2823;
+    --ink-soft:#5C534A;
+    --accent:#B4552D;      /* warm terracotta */
+    --accent-deep:#8F3F1E;
+    --green:#3E5C4B;       /* quiet secondary */
+    --card:#FFFFFF;
+    --line:#E4D9CB;
+    --radius:18px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Karla', -apple-system, 'Segoe UI', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:var(--cream);}
+  a{color:var(--accent-deep);}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.15;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(250,245,238,.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:960px;margin:0 auto;padding:14px 24px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  .nav-name{font-family:var(--serif);font-size:1.05rem;font-weight:600;color:var(--ink);text-decoration:none;}
+  .nav-links{display:flex;gap:20px;align-items:center;font-size:.92rem;}
+  .nav-links a{text-decoration:none;color:var(--ink-soft);}
+  .nav-links a:hover{color:var(--accent);}
+  .nav-cta{
+    background:var(--ink);color:var(--cream)!important;
+    padding:8px 16px;border-radius:999px;font-weight:700;
+  }
+  .nav-cta:hover{background:var(--accent);}
+  @media(max-width:640px){.nav-links a:not(.nav-cta){display:none;}}
+
+  /* ---------- hero ---------- */
+  header{padding:72px 0 64px;}
+  .hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:center;}
+  @media(max-width:720px){.hero-grid{grid-template-columns:1fr;gap:36px;}}
+  .kicker{
+    font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:18px;
+  }
+  h1{font-size:clamp(2.4rem,6vw,3.6rem);margin-bottom:20px;}
+  h1 em{font-style:italic;color:var(--accent);}
+  .hero-sub{font-size:1.15rem;color:var(--ink-soft);max-width:34em;margin-bottom:30px;}
+  .btn{
+    display:inline-block;background:var(--accent);color:var(--cream);
+    text-decoration:none;font-weight:700;font-size:1rem;
+    padding:14px 28px;border-radius:999px;
+    transition:background .2s, transform .2s;
+  }
+  .btn:hover{background:var(--accent-deep);transform:translateY(-2px);}
+  .btn-ghost{
+    display:inline-block;margin-left:14px;color:var(--ink);text-decoration:none;
+    font-weight:700;border-bottom:2px solid var(--accent);padding-bottom:2px;
+  }
+  picture{display:block;}
+  .photo{
+    width:100%;max-width:240px;height:auto;
+    display:block;margin:0 auto;
+    border-radius:var(--radius);border:1px solid var(--line);
+  }
+
+  /* ---------- marquee ---------- */
+  .marquee{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    overflow:hidden;white-space:nowrap;background:var(--cream-deep);
+    padding:14px 0;
+  }
+  .marquee-track{display:inline-block;animation:scroll 28s linear infinite;}
+  .marquee span{
+    font-family:var(--serif);font-size:1.05rem;color:var(--ink-soft);
+    margin:0 18px;
+  }
+  .marquee b{color:var(--accent);font-weight:400;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- sections ---------- */
+  section{padding:72px 0;}
+  section.alt{background:var(--cream-deep);}
+  .section-kicker{
+    font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:12px;
+  }
+  h2{font-size:clamp(1.7rem,4vw,2.3rem);margin-bottom:22px;}
+  .prose p{max-width:40em;margin-bottom:18px;color:var(--ink-soft);}
+  .prose p strong{color:var(--ink);}
+
+  /* ---------- work cards ---------- */
+  .cards{display:grid;gap:22px;margin-top:36px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:30px 30px 26px;
+    display:grid;grid-template-columns:64px 1fr;gap:22px;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(46,40,35,.08);}
+  @media(max-width:600px){.card{grid-template-columns:1fr;gap:10px;}}
+  .card-num{
+    font-family:var(--serif);font-size:1.9rem;color:var(--accent);
+  }
+  .card h3{font-size:1.25rem;margin-bottom:10px;}
+  .card p{color:var(--ink-soft);font-size:.98rem;margin-bottom:10px;}
+  .card p:last-child{margin-bottom:0;}
+  .tag{
+    display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--green);
+    background:rgba(62,92,75,.1);border-radius:999px;
+    padding:3px 10px;margin-bottom:12px;margin-right:6px;
+  }
+  .tag.ai{color:var(--accent-deep);background:rgba(180,85,45,.1);}
+  .outcome{color:var(--ink);font-weight:500;}
+
+  /* ---------- fun cards ---------- */
+  .fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:36px;}
+  @media(max-width:640px){.fun-grid{grid-template-columns:1fr;}}
+  .fun-card{
+    background:var(--card);border:1px dashed var(--accent);
+    border-radius:var(--radius);padding:28px;color:var(--ink-soft);
+  }
+  .fun-card h3{font-size:1.15rem;margin-bottom:10px;color:var(--ink);}
+  .fun-card p{font-size:.95rem;}
+
+  /* ---------- writing ---------- */
+  .post{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);margin-top:36px;overflow:hidden;
+  }
+  .post summary{
+    list-style:none;cursor:pointer;padding:30px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;
+  }
+  .post summary::-webkit-details-marker{display:none;}
+  .post summary h3{font-size:1.3rem;margin-bottom:6px;}
+  .post summary p{color:var(--ink-soft);font-size:.95rem;max-width:36em;}
+  .post .chev{
+    flex-shrink:0;width:40px;height:40px;border-radius:50%;
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    color:var(--accent);font-size:1.2rem;transition:transform .2s;
+  }
+  .post[open] .chev{transform:rotate(45deg);}
+  .post-body{padding:0 30px 34px;border-top:1px solid var(--line);}
+  .post-body p{max-width:40em;color:var(--ink-soft);margin:18px 0;}
+  .post-body h4{font-family:var(--serif);font-size:1.1rem;margin-top:26px;color:var(--ink);}
+  .coming{margin-top:22px;color:var(--ink-soft);font-size:.95rem;font-style:italic;}
+
+  /* ---------- contact ---------- */
+  .contact{
+    text-align:center;padding:88px 0;background:var(--green);color:var(--cream);
+  }
+  .contact h2{color:var(--cream);}
+  .contact p{color:#D5E0D6;max-width:32em;margin:0 auto 32px;}
+  .contact .btn{background:var(--accent);}
+  footer{
+    background:var(--green);color:#A9BEAF;text-align:center;
+    padding:0 24px 36px;font-size:.85rem;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-name" href="#top">Katie Morrison</a>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#ai">AI</a>
+      <a href="#writing">Writing</a>
+      <a class="nav-cta" href="https://www.linkedin.com/in/katherine-a-morrison/" target="_blank" rel="noopener">Connect</a>
+    </div>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">It's nice to meet you</p>
+      <h1>I help a small charity work <em>smarter than its size</em>.</h1>
+      <p class="hero-sub">I'm Katie. I look after everything operational and technical that isn't frontline work at a not-for-profit domestic violence service. I take the things that have quietly become a mess and give them a structure that holds.</p>
+      <a class="btn" href="https://www.linkedin.com/in/katherine-a-morrison/" target="_blank" rel="noopener">Connect on LinkedIn</a>
+      <a class="btn-ghost" href="#work">See my work ↓</a>
+    </div>
+    <picture>
+      <source srcset="katie.webp" type="image/webp">
+      <img class="photo" src="katie.jpg" width="800" height="800" alt="Katie Morrison smiling in a garden, wearing a dark green jumper" fetchpriority="high">
+    </picture>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>systems thinker <b>·</b></span><span>IT translator <b>·</b></span><span>first-principles fixer <b>·</b></span><span>vendor wrangler <b>·</b></span><span>clear writer <b>·</b></span><span>generalist, unapologetically <b>·</b></span>
+    <span>systems thinker <b>·</b></span><span>IT translator <b>·</b></span><span>first-principles fixer <b>·</b></span><span>vendor wrangler <b>·</b></span><span>clear writer <b>·</b></span><span>generalist, unapologetically <b>·</b></span>
+  </div>
+</div>
+
+<section id="about">
+  <div class="wrap prose">
+    <p class="section-kicker">About</p>
+    <h2>The generalist holding it together</h2>
+    <p>I'm the operational and technology backbone of a not-for-profit domestic violence service. I sit between leadership, frontline staff and vendors, and my job is to make sure the organisation around the frontline simply works: the systems, the sites, the contracts, the tools.</p>
+    <p>One day that means satellite internet for a property 900 kilometres from Sydney. The next it's rolling out AI across the organisation, or renegotiating a fleet lease. I'm not a specialist who couldn't choose. I'm the generalist holding it all together, and in a small charity that's where one person can have an outsized impact.</p>
+    <p><strong>Every dollar and hour I save is resource returned to the mission.</strong> I think of the work as stewardship, not admin.</p>
+  </div>
+</section>
+
+<section id="work" class="alt">
+  <div class="wrap">
+    <p class="section-kicker">Selected work</p>
+    <h2>A few things I've built</h2>
+    <div class="cards">
+
+      <article class="card">
+        <div class="card-num">01</div>
+        <div>
+          <span class="tag ai">AI</span><span class="tag">Systems</span>
+          <h3>An AI operating system for my working week</h3>
+          <p>My week was scattered across notes, inboxes and memory, and things were starting to slip. So I designed a system that runs it for me: plain-text notes in Obsidian plus a scheduled AI assistant that plans my mornings, closes out my days, and keeps track of every commitment I've made.</p>
+          <p class="outcome">Nothing falls through the cracks any more. I wrote it up as a full case study, and I'm now replicating the system for our finance team.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-num">02</div>
+        <div>
+          <span class="tag ai">Tools</span><span class="tag">Cost saving</span>
+          <h3>Digital business cards, built free in Canva</h3>
+          <p>Senior stakeholders wanted a paid digital business card product. Instead of signing another subscription, I built the same thing in-house with Canva: a card published as a website with a QR code, fully on-brand and editable by us.</p>
+          <p class="outcome">No ongoing cost, full design control, and a rollout the team actually enjoyed. This site works the same way: scan, read, connect.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-num">03</div>
+        <div>
+          <span class="tag">First principles</span><span class="tag">Remote tech</span>
+          <h3>Getting a colleague online, 930 km from Sydney</h3>
+          <p>A colleague needed reliable internet at a property with no mobile reception, more than 900 kilometres from Sydney. I worked the problem from first principles: compared the options, landed on Starlink Roam, and costed it over a full year including pausing the service between trips.</p>
+          <p class="outcome">A remote site connected, at a price the organisation could defend line by line.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-num">04</div>
+        <div>
+          <span class="tag">Infrastructure</span><span class="tag">Project lead</span>
+          <h3>A network upgrade across three sites</h3>
+          <p>I'm leading a cross-site network infrastructure upgrade with an external provider, owning it end to end: the initial audit, the quotes and vendor negotiation, and the implementation across all three sites.</p>
+          <p class="outcome">Modern, reliable infrastructure for a service that can't afford downtime, delivered without a tech team behind me.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="ai">
+  <div class="wrap prose">
+    <p class="section-kicker">AI, put to work</p>
+    <h2>The IT translator, now fluent in AI</h2>
+    <p>Small charities don't get tech teams, so I became one. I've always been the translator between technical and non-technical people, and AI has become the most powerful thing I translate. I use it to run an organisation: an AI assistant that manages my working week, an org-wide rollout with a hub, training and monthly coaching, and systems I'm now building for other teams.</p>
+    <p>And I use it for the joy of it. Some of what I build with AI has nothing to do with work at all, which is exactly why I trust it at work. When you build things for fun, you learn what these tools are actually good at.</p>
+  </div>
+</section>
+
+<section id="fun" class="alt">
+  <div class="wrap">
+    <p class="section-kicker">For fun</p>
+    <h2>Things I built because I wanted to</h2>
+    <div class="fun-grid">
+      <div class="fun-card">
+        <h3>Personal project one</h3>
+        <p>[Katie to supply: what it is, what it does, what made it fun to build, and a link or screenshot if shareable.]</p>
+      </div>
+      <div class="fun-card">
+        <h3>Personal project two</h3>
+        <p>[Katie to supply: same again. A couple of lines is plenty.]</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="writing">
+  <div class="wrap">
+    <p class="section-kicker">Writing</p>
+    <h2>Notes on making things work</h2>
+    <p class="prose" style="color:var(--ink-soft);max-width:40em;">I write about operations, technology and AI in the not-for-profit sector. This collection will grow; here's the first piece.</p>
+
+    <details class="post">
+      <summary>
+        <div>
+          <h3>How Claude and Obsidian run my working week</h3>
+          <p>A case study: building an AI-assisted operating system from plain-text notes and a scheduled assistant.</p>
+        </div>
+        <div class="chev">+</div>
+      </summary>
+      <div class="post-body">
+        <p><em>Draft adapted from Katie's case study. Replace with the full write-up.</em></p>
+        <h4>The problem</h4>
+        <p>My role is deliberately broad: operations, technology, vendors, facilities, whatever needs a structure. The cost of breadth is that everything competes for the same attention, and the failure mode is quiet. Nothing dramatic goes wrong; things just slip.</p>
+        <h4>What I built</h4>
+        <p>The foundation is plain-text notes in Obsidian: a daily note, a commitments register, and a file for each initiative I'm running. On top of that sits a scheduled AI assistant. Each morning it builds my daily note: the decisions I need to make, the delegations to chase, and a short prioritised plan. Each evening it reconciles the day
