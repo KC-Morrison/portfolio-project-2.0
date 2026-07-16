@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Blob Runner, Game Boy edition</title>
+  <meta name="description" content="An endless runner in the original Game Boy's four shades of green. Tap or press space to jump.">
+  <link rel="canonical" href="https://kmorrison.dev/blob-runner/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF5EE'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23B4552D' text-anchor='middle'%3EKM%3C/text%3E%3C/svg%3E">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #2d2d2d;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 10px;
+    }
+    #game {
+      background: linear-gradient(145deg, #c4c4be 0%, #aaaaa4 100%);
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: 
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.1),
+        0 10px 30px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Plastic texture overlay */
+    #game::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.03) 2px,
+          rgba(255,255,255,0.03) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(0,0,0,0.02) 2px,
+          rgba(0,0,0,0.02) 4px
+        );
+      pointer-events: none;
+      border-radius: 20px;
+    }
+    /* Subtle noise texture */
+    #game::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      border-radius: 20px;
+    }
+    #screen {
+      background: #0f380f;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    #info {
+      text-align: center;
+      margin-top: 12px;
+      color: #555;
+      position: relative;
+      z-index: 1;
+    }
+    #info p { margin: 4px 0; }
+    .score { 
+      font-size: 18px; 
+      font-weight: bold; 
+      color: #333;
+      text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+    }
+    .highscore { font-size: 12px; color: #666; }
+    .instructions { font-size: 14px; color: #555; }
+    
+    #settings-row {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+      z-index: 1;
+    }
+    /* Grip lines - bottom right corner */
+    .grip-lines {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
+      z-index: 1;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+    .grip-lines::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.12) 3px,
+        rgba(0,0,0,0.12) 5px,
+        transparent 5px,
+        transparent 6px,
+        rgba(255,255,255,0.15) 6px,
+        rgba(255,255,255,0.15) 7px
+      );
+    }
+    #mode-toggle, #char-toggle, #sound-toggle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #8b2252;
+      border: none;
+      color: #ffddee;
+      font-family: monospace;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 
+        inset 0 -3px 6px rgba(0,0,0,0.3),
+        0 3px 6px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+    }
+    #mode-toggle:active, #char-toggle:active, #sound-toggle:active {
+      box-shadow: 
+        inset 0 3px 6px rgba(0,0,0,0.3),
+        0 1px 3px rgba(0,0,0,0.2);
+      transform: translateY(2px);
+    }
+    #sound-panel {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8b2252;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 
+        inset 0 -3px 6px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.3);
+    }
+    #sound-panel.hidden {
+      display: none;
+    }
+    #sound-panel label {
+      color: #ffddee;
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    #sound-panel input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid #ffddee;
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    #sound-panel input[type="checkbox"]:checked {
+      background: #ffddee;
+    }
+    #sound-panel input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      background: #8b2252;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="screen">
+      <canvas id="canvas" width="160" height="144"></canvas>
+    </div>
+    <div id="info">
+      <p class="instructions">TAP or SPACE to jump!</p>
+      <p class="score" id="score">0</p>
+      <p class="highscore" id="highscore">HI: 0</p>
+    </div>
+    <div id="settings-row" onclick="event.stopPropagation()">
+      <button id="mode-toggle" onclick="event.stopPropagation(); toggleMode();">FAST</button>
+      <button id="char-toggle" onclick="event.stopPropagation(); toggleCharacter();">BLOB</button>
+      <button id="sound-toggle" onclick="event.stopPropagation(); toggleSoundPanel();">SND</button>
+      <div id="sound-panel" class="hidden" onclick="event.stopPropagation()">
+        <label><input type="checkbox" id="snd-jump" checked onclick="event.stopPropagation()"> JUMP</label>
+        <label><input type="checkbox" id="snd-double" checked onclick="event.stopPropagation()"> DBL JUMP</label>
+        <label><input type="checkbox" id="snd-land" checked onclick="event.stopPropagation()"> LAND</label>
+        <label><input type="checkbox" id="snd-death" checked onclick="event.stopPropagation()"> DEATH</label>
+      </div>
+    </div>
+    <div class="grip-lines"></div>
+  </div>
+  <p style="text-align:center; font-size:11px; color:#666; margin-top:22px;">A personal project by <a href="https://kmorrison.dev/" style="color:#888;">Katie Morrison</a>, built with AI as a single HTML file.</p>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Sound settings
+const soundSettings = {
+  jump: true,
+  doubleJump: true,
+  landing: true,
+  death: true
+};
+
+function toggleSoundPanel() {
+  const panel = document.getElementById('sound-panel');
+  panel.classList.toggle('hidden');
+}
+
+function updateSoundSettings() {
+  soundSettings.jump = document.getElementById('snd-jump').checked;
+  soundSettings.doubleJump = document.getElementById('snd-double').checked;
+  soundSettings.landing = document.getElementById('snd-land').checked;
+  soundSettings.death = document.getElementById('snd-death').checked;
+  
+  // Update button style
+  const anyOn = Object.values(soundSettings).some(v => v);
+  const btn = document.getElementById('sound-toggle');
+  btn.textContent = anyOn ? 'SND' : 'OFF';
+  btn.classList.toggle('muted', !anyOn);
+}
+
+// Add event listeners for checkboxes
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('snd-jump').addEventListener('change', updateSoundSettings);
+  document.getElementById('snd-double').addEventListener('change', updateSoundSettings);
+  document.getElementById('snd-land').addEventListener('change', updateSoundSettings);
+  document.getElementById('snd-death').addEventListener('change', updateSoundSettings);
+});
+
+// Audio setup
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function createBitcrusher(actx, bits, normFreq) {
+  const node = actx.createScriptProcessor(4096, 1, 1);
+  let step = Math.pow(0.5, bits);
+  let phaser = 0;
+  let last = 0;
+  
+  node.onaudioprocess = (e) => {
+    const input = e.inputBuffer.getChannelData(0);
+    const output = e.outputBuffer.getChannelData(0);
+    
+    for (let i = 0; i < input.length; i++) {
+      phaser += normFreq;
+      if (phaser >= 1) {
+        phaser -= 1;
+        last = step * Math.floor(input[i] / step + 0.5);
+      }
+      output[i] = last;
+    }
+  };
+  
+  return node;
+}
+
+function playLandingSound() {
+  if (!soundSettings.landing) return;
+  
+  const actx = getAudioContext();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  const bitcrusher = createBitcrusher(actx, 3, 0.5);
+  
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(800, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, actx.currentTime + 0.03);
+  
+  gain.gain.setValueAtTime(0.25, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.05);
+  
+  osc.connect(bitcrusher);
+  bitcrusher.connect(gain);
+  gain.connect(actx.destination);
+  
+  osc.start();
+  osc.stop(actx.currentTime + 0.05);
+}
+
+function playDeathSound() {
+  if (!soundSettings.death) return;
+  
+  const actx = getAudioContext();
+  
+  for (let i = 0; i < 5; i++) {
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    const bitcrusher = createBitcrusher(actx, 2, 0.3);
+    
+    const startTime = actx.currentTime + i * 0.05;
+    
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(300 - i * 50, startTime);
+    osc.frequency.exponentialRampToValueAtTime(50, startTime + 0.04);
+    
+    gain.gain.setValueAtTime(0.2, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.05);
+    
+    osc.connect(bitcrusher);
+    bitcrusher.connect(gain);
+    gain.connect(actx.destination);
+    
+    osc.start(startTime);
+    osc.stop(startTime + 0.05);
+  }
+}
+
+function playJumpSound() {
+  if (!soundSettings.jump) return;
+  
+  const actx = getAudioContext();
+  const osc = actx.createOscillator();
+  const lfo = actx.createOscillator();
+  const lfoGain = actx.createGain();
+  const gain = actx.createGain();
+  const bitcrusher = createBitcrusher(actx, 3, 0.4);
+  
+  lfo.frequency.value = 30;
+  lfoGain.gain.value = 200;
+  
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(600, actx.currentTime);
+  
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+  
+  gain.gain.setValueAtTime(0.2, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.08);
+  
+  osc.connect(bitcrusher);
+  bitcrusher.connect(gain);
+  gain.connect(actx.destination);
+  
+  lfo.start();
+  osc.start();
+  osc.stop(actx.currentTime + 0.08);
+  lfo.stop(actx.currentTime + 0.08);
+}
+
+function playDoubleJumpSound() {
+  if (!soundSettings.doubleJump) return;
+  
+  const actx = getAudioContext();
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  const bitcrusher = createBitcrusher(actx, 3, 0.45);
+  
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(200, actx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1000, actx.currentTime + 0.06);
+  
+  gain.gain.setValueAtTime(0.22, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.07);
+  
+  osc.connect(bitcrusher);
+  bitcrusher.connect(gain);
+  gain.connect(actx.destination);
+  
+  osc.start();
+  osc.stop(actx.currentTime + 0.07);
+}
+
+// Gameboy color palette (4 shades of green)
+const GB = {
+  darkest:  '#0f380f',
+  dark:     '#306230',
+  light:    '#8bac0f',
+  lightest: '#9bbc0f'
+};
+
+let gameRunning = false;
+let gameOver = false;
+let score = 0;
+let highScore = 0;
+let frameCount = 0;
+
+// Character selection: 'blob' or 'sock'
+let selectedCharacter = 'blob';
+
+// Game mode: 'chill', 'medium', 'fast'
+let gameMode = 'fast';
+const gameModes = {
+  chill:  { baseSpeed: 1.5, accelerates: false, label: 'CHILL' },
+  medium: { baseSpeed: 2.5, accelerates: false, label: 'MED' },
+  fast:   { baseSpeed: 2,   accelerates: true,  label: 'FAST' }
+};
+
+const blob = {
+  x: 20,
+  y: 100,
+  width: 20,
+  height: 16,
+  velocityY: 0,
+  jumping: false,
+  canDoubleJump: false,
+  hasDoubleJumped: false,
+  gravity: 0.5,
+  jumpForce: -7,
+  squish: 0
+};
+
+let obstacles = [];
+const groundY = 120;
+
+// Weird but true fun facts
+const funFacts = [
+  "Wombat poop is cube-shaped",
+  "Honey never spoils",
+  "Octopuses have three hearts",
+  "Bananas are berries, strawberries aren't",
+  "A group of flamingos is called a flamboyance",
+  "Cows have best friends",
+  "Sea otters hold hands while sleeping",
+  "Sharks are older than trees",
+  "A jiffy is 1/100th of a second",
+  "Scotland's national animal is a unicorn",
+  "Humans share 60% of DNA with bananas",
+  "The inventor of Pringles is buried in one",
+  "Vending machines kill more people than sharks",
+  "Oxford University is older than the Aztec Empire",
+  "Cleopatra lived closer to the Moon landing than to the building of the Great Pyramid",
+  "There are more fake flamingos than real ones",
+  "A cloud weighs about a million pounds",
+  "Nintendo was founded in 1889",
+  "Lobsters taste with their feet",
+  "The shortest war lasted 38 minutes",
+  "Pigeons can do math",
+  "Sloths can hold their breath longer than dolphins",
+  "There's a species of jellyfish that is immortal",
+  "Humans are the only animals that blush",
+  "A flock of crows is called a murder"
+];
+let currentFact = "";
+
+// Background elements for parallax/speed indication
+let bgElementsFar = [];   // Slow - stalactites on ceiling
+let bgElementsMid = [];   // Medium - mushrooms/plants
+let bgElementsNear = [];  // Fast - ground pebbles/debris
+
+function initBackgroundElements() {
+  // Far layer - ceiling stalactites
+  for (let i = 0; i < 8; i++) {
+    bgElementsFar.push({
+      x: i * 25 + Math.random() * 15,
+      type: Math.floor(Math.random() * 3),
+      height: 10 + Math.floor(Math.random() * 15)
+    });
+  }
+  
+  // Mid layer - triangle mountains
+  for (let i = 0; i < 4; i++) {
+    bgElementsMid.push({
+      x: i * 50 + Math.random() * 30,
+      size: 25 + Math.floor(Math.random() * 20)
+    });
+  }
+  
+  // Near layer - ground pebbles (sparse and subtle)
+  for (let i = 0; i < 5; i++) {
+    bgElementsNear.push({
+      x: i * 35 + Math.random() * 20,
+      size: 1 + Math.floor(Math.random() * 2)
+    });
+  }
+}
+
+initBackgroundElements();
+
+// Randomized spawning variables
+let nextSpawnFrame = 60;
+let minSpawnGap = 45;
+let maxSpawnGap = 120;
+
+function getNextSpawnDelay() {
+  // Random delay between min and max, with occasional longer pauses
+  const baseDelay = minSpawnGap + Math.random() * (maxSpawnGap - minSpawnGap);
+  
+  // 15% chance of a longer "breather" gap
+  if (Math.random() < 0.15) {
+    return baseDelay + 40 + Math.random() * 30;
+  }
+  
+  // 10% chance of a quick double-obstacle (short gap)
+  if (Math.random() < 0.10) {
+    return minSpawnGap * 0.7;
+  }
+  
+  return baseDelay;
+}
+
+// Pixel art helper
+function pxRect(x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.floor(x), Math.floor(y), w, h);
+}
+
+// Draw the slug blob
+function drawBlob() {
+  const x = Math.floor(blob.x);
+  let y = Math.floor(blob.y);
+  
+  // Squish and stretch animation
+  let squishX = 0;
+  let squishY = 0;
+  
+  if (blob.jumping) {
+    if (blob.velocityY < 0) {
+      // Going up - stretch vertically
+      squishY = -3;
+      squishX = -1;
+    } else {
+      // Falling - squish vertically
+      squishY = 2;
+      squishX = 1;
+    }
+  } else {
+    // Idle wobble
+    squishY = Math.sin(frameCount * 0.2) * 1;
+  }
+  
+  // Slime trail
+  const trailWobble = Math.sin(frameCount * 0.3) * 0.5;
+  pxRect(x - 8, y + 14 + squishY, 6, 2, GB.dark);
+  pxRect(x - 14, y + 15 + squishY + trailWobble, 4, 1, GB.dark);
+  
+  // Body - main blob shape (outline)
+  pxRect(x + 2, y + 4 + squishY, 16 + squishX, 12 - squishY, GB.darkest);
+  
+  // Body fill
+  pxRect(x + 3, y + 5 + squishY, 14 + squishX, 10 - squishY, GB.dark);
+  
+  // Body highlight (top)
+  pxRect(x + 4, y + 6 + squishY, 8, 4 - squishY/2, GB.light);
+  
+  // Rounded top bumps
+  pxRect(x + 4, y + 2 + squishY, 4, 3, GB.darkest);
+  pxRect(x + 4 + 1, y + 2 + squishY + 1, 2, 2, GB.dark);
+  
+  pxRect(x + 12, y + 2 + squishY, 4, 3, GB.darkest);
+  pxRect(x + 12 + 1, y + 2 + squishY + 1, 2, 2, GB.dark);
+  
+  // Eye stalks
+  const eyeBob = Math.sin(frameCount * 0.15) * 1;
+  
+  // Left eye stalk
+  pxRect(x + 5, y - 2 + squishY + eyeBob, 2, 5, GB.darkest);
+  pxRect(x + 4, y - 4 + squishY + eyeBob, 4, 3, GB.darkest);
+  pxRect(x + 5, y - 3 + squishY + eyeBob, 2, 2, GB.lightest);
+  // Pupil
+  const pupilOffset = blob.jumping ? -1 : 0;
+  pxRect(x + 5, y - 3 + squishY + eyeBob + pupilOffset, 1, 1, GB.darkest);
+  
+  // Right eye stalk
+  pxRect(x + 13, y - 2 + squishY - eyeBob, 2, 5, GB.darkest);
+  pxRect(x + 12, y - 4 + squishY - eyeBob, 4, 3, GB.darkest);
+  pxRect(x + 13, y - 3 + squishY - eyeBob, 2, 2, GB.lightest);
+  // Pupil
+  pxRect(x + 13, y - 3 + squishY - eyeBob + pupilOffset, 1, 1, GB.darkest);
+  
+  // Cute mouth
+  if (!blob.jumping) {
+    pxRect(x + 8, y + 11 + squishY, 4, 1, GB.darkest);
+  } else if (blob.velocityY < 0) {
+    // Open mouth when jumping up (excited)
+    pxRect(x + 8, y + 10 + squishY, 4, 2, GB.darkest);
+    pxRect(x + 9, y + 11 + squishY, 2, 1, GB.light);
+  } else {
+    // Worried mouth when falling
+    pxRect(x + 9, y + 10 + squishY, 2, 2, GB.darkest);
+  }
+  
+  // Bottom ripple/foot
+  const ripple = Math.floor(frameCount / 6) % 3;
+  if (!blob.jumping) {
+    pxRect(x + 1 + ripple, y + 14 + squishY, 4, 2, GB.darkest);
+    pxRect(x + 8, y + 14 + squishY, 4, 2, GB.darkest);
+    pxRect(x + 14 - ripple, y + 14 + squishY, 4, 2, GB.darkest);
+  }
+}
+
+// Draw the coffee cup character
+function drawCoffee() {
+  const x = Math.floor(blob.x);
+  let y = Math.floor(blob.y);
+  
+  // Squish and stretch
+  let squishY = 0;
+  
+  if (blob.jumping) {
+    if (blob.velocityY < 0) {
+      squishY = -3;
+    } else {
+      squishY = 2;
+    }
+  } else {
+    squishY = Math.sin(frameCount * 0.15) * 1;
+  }
+  
+  // Shadow
+  if (!blob.jumping) {
+    pxRect(x + 2, groundY - 1, 14, 2, GB.dark);
+  }
+  
+  // === COFFEE CUP ===
+  
+  // Main cup body (slight taper - wider at top)
+  // Outline
+  pxRect(x + 2, y - 6 + squishY, 14, 22 - squishY, GB.darkest);
+  // Fill (light colored cup)
+  pxRect(x + 3, y - 5 + squishY, 12, 20 - squishY, GB.lightest);
+  
+  // Taper effect - cut corners at bottom
+  pxRect(x + 2, y + 12 + squishY, 2, 4, GB.lightest);  // Hide bottom left corner
+  pxRect(x + 14, y + 12 + squishY, 2, 4, GB.lightest); // Hide bottom right corner
+  pxRect(x + 3, y + 13 + squishY, 1, 3, GB.darkest);   // Redraw taper line left
+  pxRect(x + 14, y + 13 + squishY, 1, 3, GB.darkest);  // Redraw taper line right
+  
+  // Lid (darker, slightly wider than cup top)
+  pxRect(x + 1, y - 10 + squishY, 16, 5, GB.darkest);
+  pxRect(x + 2, y - 9 + squishY, 14, 3, GB.dark);
+  
+  // Lid lip/spout
+  pxRect(x + 5, y - 12 + squishY, 6, 3, GB.darkest);
+  pxRect(x + 6, y - 11 + squishY, 4, 2, GB.dark);
+  
+  // Coffee sleeve (cardboard band in middle)
+  pxRect(x + 3, y + 2 + squishY, 12, 8, GB.dark);
+  pxRect(x + 4, y + 3 + squishY, 10, 6, GB.dark);
+  
+  // Sleeve texture lines
+  pxRect(x + 4, y + 4 + squishY, 10, 1, GB.darkest);
+  pxRect(x + 4, y + 7 + squishY, 10, 1, GB.darkest);
+  
+  // Steam wisps (only when not jumping)
+  if (!blob.jumping) {
+    const steam1 = Math.sin(frameCount * 0.2) * 2;
+    const steam2 = Math.sin(frameCount * 0.2 + 1) * 2;
+    pxRect(x + 6 + steam1, y - 16 + squishY, 2, 3, GB.light);
+    pxRect(x + 10 + steam2, y - 14 + squishY, 2, 2, GB.light);
+  }
+  
+  // Face on the sleeve
+  const faceY = y + 3 + squishY;
+  
+  // Eyes
+  pxRect(x + 5, faceY + 1, 2, 2, GB.darkest);
+  pxRect(x + 11, faceY + 1, 2, 2, GB.darkest);
+  
+  // Mouth
+  if (!blob.jumping) {
+    pxRect(x + 7, faceY + 4, 4, 1, GB.darkest);
+  } else if (blob.velocityY < 0) {
+    // Excited
+    pxRect(x + 7, faceY + 3, 4, 2, GB.darkest);
+    pxRect(x + 8, faceY + 4, 2, 1, GB.light);
+  } else {
+    // Worried
+    pxRect(x + 8, faceY + 3, 2, 2, GB.darkest);
+  }
+}
+
+// Draw the ball character (small with high jump)
+function drawBall() {
+  const x = Math.floor(blob.x);
+  // Offset y so the ball sits on the ground (ball is smaller than blob)
+  let y = Math.floor(blob.y) + 6;
+  
+  // Squish and stretch (more dramatic for a ball)
+  let squishX = 0;
+  let squishY = 0;
+  
+  if (blob.jumping) {
+    if (blob.velocityY < -3) {
+      squishY = -4;
+      squishX = 2;
+    } else if (blob.velocityY < 0) {
+      squishY = -2;
+      squishX = 1;
+    } else if (blob.velocityY > 3) {
+      squishY = -3;
+      squishX = 2;
+    } else {
+      squishY = 1;
+      squishX = -1;
+    }
+  } else {
+    const bounce = Math.sin(frameCount * 0.2);
+    squishY = bounce * 1;
+    squishX = -bounce * 0.5;
+  }
+  
+  // Shadow
+  if (!blob.jumping) {
+    pxRect(x + 2, groundY - 1, 8, 2, GB.dark);
+  } else {
+    const shadowScale = Math.max(0.3, 1 - (groundY - y) / 80);
+    const shadowWidth = Math.floor(8 * shadowScale);
+    const shadowX = x + 2 + (8 - shadowWidth) / 2;
+    pxRect(shadowX, groundY - 1, shadowWidth, 1, GB.dark);
+  }
+  
+  // Main ball body
+  pxRect(x + 2 + squishX/2, y - 2 + squishY, 8 - squishX, 12 - squishY, GB.darkest);
+  pxRect(x + 1 + squishX/2, y + squishY, 10 - squishX, 8 - squishY, GB.darkest);
+  
+  // Inner fill
+  pxRect(x + 2 + squishX/2, y - 1 + squishY, 8 - squishX, 10 - squishY, GB.dark);
+  pxRect(x + 3 + squishX/2, y - 2 + squishY, 6 - squishX, 12 - squishY, GB.dark);
+  
+  // Highlight
+  pxRect(x + 3, y + squishY, 3, 3, GB.light);
+  pxRect(x + 4, y - 1 + squishY, 2, 2, GB.lightest);
+  
+  // Face
+  const faceY = y + 2 + squishY;
+  
+  // Eyes
+  pxRect(x + 3, faceY, 2, 2, GB.darkest);
+  pxRect(x + 7, faceY, 2, 2, GB.darkest);
+  pxRect(x + 3, faceY, 1, 1, GB.lightest);
+  pxRect(x + 7, faceY, 1, 1, GB.lightest);
+  
+  // Mouth
+  if (!blob.jumping) {
+    pxRect(x + 4, faceY + 3, 4, 1, GB.darkest);
+    pxRect(x + 5, faceY + 4, 2, 1, GB.darkest);
+  } else if (blob.velocityY < 0) {
+    pxRect(x + 4, faceY + 2, 4, 3, GB.darkest);
+    pxRect(x + 5, faceY + 3, 2, 1, GB.light);
+  } else {
+    pxRect(x + 5, faceY + 2, 2, 2, GB.darkest);
+  }
+  
+  // Motion lines
+  if (blob.jumping && Math.abs(blob.velocityY) > 4) {
+    const lineY = y + 4;
+    if (blob.velocityY < 0) {
+      pxRect(x + 4, lineY + 10, 1, 3, GB.light);
+      pxRect(x + 7, lineY + 12, 1, 2, GB.light);
+    } else {
+      pxRect(x + 4, lineY - 12, 1, 3, GB.light);
+      pxRect(x + 7, lineY - 10, 1, 2, GB.light);
+    }
+  }
+}
+
+// Draw the current character
+function drawCharacter() {
+  if (selectedCharacter === 'coffee') {
+    drawCoffee();
+  } else if (selectedCharacter === 'ball') {
+    drawBall();
+  } else {
+    drawBlob();
+  }
+}
+
+function toggleCharacter() {
+  const chars = ['blob', 'coffee', 'ball'];
+  const currentIndex = chars.indexOf(selectedCharacter);
+  selectedCharacter = chars[(currentIndex + 1) % chars.length];
+  const labels = { blob: 'BLOB', coffee: 'COFFEE', ball: 'BALL' };
+  document.getElementById('char-toggle').textContent = labels[selectedCharacter];
+  
+  // Ball has different jump force
+  if (selectedCharacter === 'ball') {
+    blob.jumpForce = -10;
+  } else {
+    blob.jumpForce = -7;
+  }
+}
+
+function toggleMode() {
+  const modes = ['chill', 'medium', 'fast'];
+  const currentIndex = modes.indexOf(gameMode);
+  gameMode = modes[(currentIndex + 1) % modes.length];
+  document.getElementById('mode-toggle').textContent = gameModes[gameMode].label;
+}
+
+function spawnObstacle() {
+  const types = ['rock', 'spike', 'crystal'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  
+  // Randomize obstacle height slightly
+  const heightVariation = Math.floor(Math.random() * 4) - 2;
+  
+  obstacles.push({
+    x: 170,
+    y: groundY - 14 + heightVariation,
+    width: 12,
+    height: 14,
+    type: type
+  });
+}
+
+function drawObstacle(obs) {
+  const x = Math.floor(obs.x);
+  const y = Math.floor(obs.y);
+  
+  if (obs.type === 'rock') {
+    pxRect(x + 2, y + 4, 10, 10, GB.darkest);
+    pxRect(x + 3, y + 5, 8, 8, GB.dark);
+    pxRect(x + 4, y + 6, 4, 4, GB.light);
+    pxRect(x, y + 8, 4, 6, GB.darkest);
+    pxRect(x + 1, y + 9, 2, 4, GB.dark);
+  } else if (obs.type === 'spike') {
+    pxRect(x + 4, y, 4, 14, GB.darkest);
+    pxRect(x + 5, y + 2, 2, 10, GB.dark);
+    pxRect(x + 5, y + 4, 1, 4, GB.light);
+    pxRect(x, y + 6, 4, 8, GB.darkest);
+    pxRect(x + 1, y + 7, 2, 6, GB.dark);
+    pxRect(x + 8, y + 4, 4, 10, GB.darkest);
+    pxRect(x + 9, y + 5, 2, 8, GB.dark);
+  } else {
+    // Crystal
+    pxRect(x + 4, y - 2, 6, 16, GB.darkest);
+    pxRect(x + 5, y, 4, 12, GB.light);
+    pxRect(x + 6, y + 2, 2, 8, GB.lightest);
+    pxRect(x, y + 4, 4, 10, GB.darkest);
+    pxRect(x + 1, y + 5, 2, 8, GB.light);
+  }
+}
+
+function drawGround() {
+  pxRect(0, groundY, 160, 2, GB.darkest);
+  
+  const offset = Math.floor(frameCount / 2) % 8;
+  for (let i = -offset; i < 170; i += 8) {
+    pxRect(i, groundY + 6, 4, 1, GB.dark);
+    pxRect(i + 2, groundY + 12, 3, 1, GB.dark);
+  }
+}
+
+function drawBackgroundFar(speed) {
+  // Far layer disabled - was stalactites
+}
+
+function drawBackgroundMid(speed) {
+  // Background mountains - medium speed
+  const midSpeed = speed * 0.5;
+  
+  bgElementsMid.forEach(el => {
+    el.x -= midSpeed;
+    if (el.x < -60) {
+      el.x = 180 + Math.random() * 40;
+      el.size = 25 + Math.floor(Math.random() * 20);
+    }
+    
+    const x = Math.floor(el.x);
+    const peakY = groundY - el.size;
+    const baseWidth = el.size * 1.5;
+    
+    // Draw triangle mountain with flat bottom
+    // Left slope
+    for (let i = 0; i < el.size; i++) {
+      const rowWidth = Math.floor((i / el.size) * (baseWidth / 2));
+      pxRect(x + baseWidth/2 - rowWidth, peakY + i, rowWidth * 2, 1, GB.light);
+    }
+    
+    // Darker shading on right side
+    for (let i = 0; i < el.size; i++) {
+      const rowWidth = Math.floor((i / el.size) * (baseWidth / 2));
+      if (rowWidth > 2) {
+        pxRect(x + baseWidth/2 + rowWidth/3, peakY + i, rowWidth/2, 1, GB.dark);
+      }
+    }
+  });
+}
+
+function drawBackgroundNear(speed) {
+  // Ground pebbles/debris - fastest, same as obstacles
+  const nearSpeed = speed * 0.9;
+  
+  bgElementsNear.forEach(el => {
+    el.x -= nearSpeed;
+    if (el.x < -5) {
+      el.x = 165 + Math.random() * 15;
+      el.size = 1 + Math.floor(Math.random() * 2);
+    }
+    
+    const x = Math.floor(el.x);
+    // Light subtle pebbles
+    pxRect(x, groundY - el.size - 1, el.size, el.size, GB.light);
+  });
+}
+
+function drawClouds() {
+  // Cloud 1
+  const offset1 = Math.floor(frameCount / 3) % 220;
+  const c1x = 200 - offset1;
+  pxRect(c1x, 20, 16, 6, GB.light);
+  pxRect(c1x + 4, 16, 8, 4, GB.light);
+  
+  // Cloud 2
+  const offset2 = Math.floor(frameCount / 4) % 260;
+  const c2x = 240 - offset2;
+  pxRect(c2x, 38, 12, 5, GB.light);
+  pxRect(c2x + 2, 35, 8, 3, GB.light);
+  
+  // Cloud 3 (new)
+  const offset3 = Math.floor(frameCount / 3.5) % 240;
+  const c3x = 180 - offset3;
+  pxRect(c3x, 10, 20, 7, GB.light);
+  pxRect(c3x + 5, 6, 10, 4, GB.light);
+  
+  // Cloud 4 (new) - small wispy
+  const offset4 = Math.floor(frameCount / 5) % 280;
+  const c4x = 260 - offset4;
+  pxRect(c4x, 28, 10, 4, GB.light);
+  pxRect(c4x + 3, 26, 5, 2, GB.light);
+  
+  // Cloud 5 (new) - larger fluffy
+  const offset5 = Math.floor(frameCount / 4.5) % 300;
+  const c5x = 300 - offset5;
+  pxRect(c5x, 45, 14, 5, GB.light);
+  pxRect(c5x + 3, 42, 8, 3, GB.light);
+}
+
+function drawStartScreen() {
+  ctx.fillStyle = GB.lightest;
+  ctx.fillRect(0, 0, 160, 144);
+  
+  // Draw static background for title screen
+  drawBackgroundFar(0);
+  drawBackgroundMid(0);
+  drawGround();
+  drawCharacter();
+  
+  ctx.fillStyle = GB.darkest;
+  ctx.font = 'bold 10px monospace';
+  ctx.textAlign = 'center';
+  const titles = { blob: 'BLOB RUN', coffee: 'COFFEE RUN', ball: 'BALL RUN' };
+  ctx.fillText(titles[selectedCharacter], 80, 50);
+  
+  ctx.font = '8px monospace';
+  ctx.fillText('TAP TO START', 80, 70);
+}
+
+function drawGameOver() {
+  // Larger box to fit fun fact
+  ctx.fillStyle = 'rgba(155, 188, 15, 0.9)';
+  ctx.fillRect(8, 20, 144, 115);
+  pxRect(8, 20, 144, 2, GB.darkest);
+  pxRect(8, 133, 144, 2, GB.darkest);
+  pxRect(8, 20, 2, 115, GB.darkest);
+  pxRect(150, 20, 2, 115, GB.darkest);
+  
+  ctx.fillStyle = GB.darkest;
+  ctx.font = 'bold 10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', 80, 36);
+  ctx.font = '8px monospace';
+  ctx.fillText('SCORE: ' + score, 80, 50);
+  
+  // Fun fact with word wrap
+  ctx.font = '7px monospace';
+  const words = currentFact.split(' ');
+  let lines = [];
+  let currentLine = '';
+  const maxWidth = 130;
+  
+  words.forEach(word => {
+    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  if (currentLine) lines.push(currentLine);
+  
+  ctx.fillText('~ FUN FACT ~', 80, 68);
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 80, 80 + i * 10);
+  });
+  
+  ctx.font = '8px monospace';
+  ctx.fillText('TAP TO RETRY', 80, 125);
+}
+
+function update() {
+  if (!gameRunning || gameOver) return;
+  
+  frameCount++;
+  
+  const wasInAir = blob.jumping;
+  
+  blob.velocityY += blob.gravity;
+  blob.y += blob.velocityY;
+  
+  if (blob.y >= groundY - blob.height) {
+    blob.y = groundY - blob.height;
+    blob.velocityY = 0;
+    blob.jumping = false;
+    
+    // Play landing sound when hitting ground from a jump
+    if (wasInAir) {
+      playLandingSound();
+    }
+  }
+  
+  // Speed increases with score
+  const speed = getSpeed();
+  obstacles.forEach(obs => obs.x -= speed);
+  obstacles = obstacles.filter(obs => obs.x > -20);
+  
+  // Randomized obstacle spawning
+  if (frameCount >= nextSpawnFrame) {
+    spawnObstacle();
+    
+    // Difficulty adjustment: gaps get tighter as score increases
+    const difficultyFactor = Math.max(0.6, 1 - (score / 3000));
+    minSpawnGap = Math.max(30, 45 * difficultyFactor);
+    maxSpawnGap = Math.max(60, 120 * difficultyFactor);
+    
+    nextSpawnFrame = frameCount + getNextSpawnDelay();
+  }
+  
+  // Collision detection
+  obstacles.forEach(obs => {
+    if (
+      blob.x + 4 < obs.x + obs.width - 2 &&
+      blob.x + blob.width - 2 > obs.x + 2 &&
+      blob.y + blob.height > obs.y + 4
+    ) {
+      endGame();
+    }
+  });
+  
+  score++;
+  document.getElementById('score').textContent = score;
+}
+
+function getSpeed() {
+  const mode = gameModes[gameMode];
+  if (mode.accelerates) {
+    return mode.baseSpeed + Math.floor(score / 300) * 0.5;
+  }
+  return mode.baseSpeed;
+}
+
+function draw() {
+  ctx.fillStyle = GB.lightest;
+  ctx.fillRect(0, 0, 160, 144);
+  
+  if (!gameRunning && !gameOver) {
+    drawStartScreen();
+    return;
+  }
+  
+  const speed = getSpeed();
+  
+  drawBackgroundFar(speed);
+  drawClouds();
+  drawBackgroundMid(speed);
+  drawBackgroundNear(speed);
+  drawGround();
+  obstacles.forEach(drawObstacle);
+  drawCharacter();
+  
+  if (gameOver) {
+    drawGameOver();
+  }
+}
+
+function jump() {
+  if (gameOver) {
+    resetGame();
+    return;
+  }
+  if (!gameRunning) {
+    gameRunning = true;
+  }
+  if (!blob.jumping) {
+    // First jump from ground
+    blob.velocityY = blob.jumpForce;
+    blob.jumping = true;
+    blob.canDoubleJump = true;
+    blob.hasDoubleJumped = false;
+    playJumpSound();
+  } else if (blob.canDoubleJump && !blob.hasDoubleJumped) {
+    // Double jump in mid-air
+    blob.velocityY = blob.jumpForce * 0.85;
+    blob.hasDoubleJumped = true;
+    playDoubleJumpSound();
+  }
+}
+
+function endGame() {
+  gameOver = true;
+  playDeathSound();
+  currentFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+  if (score > highScore) {
+    highScore = score;
+    document.getElementById('highscore').textContent = 'HI: ' + highScore;
+  }
+}
+
+function resetGame() {
+  gameOver = false;
+  gameRunning = true;
+  score = 0;
+  frameCount = 0;
+  obstacles = [];
+  blob.y = groundY - blob.height;
+  blob.velocityY = 0;
+  blob.jumping = false;
+  blob.canDoubleJump = false;
+  blob.hasDoubleJumped = false;
+  
+  // Reset spawn timing
+  minSpawnGap = 45;
+  maxSpawnGap = 120;
+  nextSpawnFrame = frameCount + 60;
+  
+  // Reinitialize background
+  bgElementsFar = [];
+  bgElementsMid = [];
+  bgElementsNear = [];
+  initBackgroundElements();
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    jump();
+  }
+});
+
+document.getElementById('game').addEventListener('click', e => {
+  if (e.target.closest('#settings-row')) return;
+  e.preventDefault();
+  jump();
+});
+
+document.getElementById('game').addEventListener('touchstart', e => {
+  if (e.target.closest('#settings-row')) return;
+  e.preventDefault();
+  jump();
+}, { passive: false });
+
+document.addEventListener('dblclick', e => e.preventDefault());
+
+draw();
+gameLoop();
+</script>
+</body>
+</html>

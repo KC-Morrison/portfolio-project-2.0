@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Idea Collider</title>
+<meta name="description" content="A system for generating project ideas that are original by construction. Roll a collision, steelman it, apply the kill test.">
+<link rel="canonical" href="https://kmorrison.dev/collider/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF5EE'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23B4552D' text-anchor='middle'%3EKM%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #faf7f2; --card: #ffffff; --ink: #2c2a26; --muted: #8a857c;
+    --line: #e5e0d6; --accent: #b5542c; --accent-soft: #f6e8e0; --lock: #1d6f5c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.65; padding: 3rem 1.25rem 4rem;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 2.2rem; font-weight: normal; letter-spacing: -0.01em; }
+  .tagline { color: var(--muted); font-style: italic; margin: 0.35rem 0 2.25rem; }
+  h2 { font-size: 1.05rem; font-weight: bold; margin: 2.5rem 0 0.75rem;
+       text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+  p { margin-bottom: 0.9rem; }
+  .steps { counter-reset: step; padding-left: 0; list-style: none; }
+  .steps li { counter-increment: step; margin-bottom: 0.9rem; padding-left: 2.4rem; position: relative; }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 0.15rem;
+    width: 1.6rem; height: 1.6rem; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-family: sans-serif;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin: 1rem 0 0.75rem; }
+  .slot {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.9rem 1rem; transition: border-color 0.15s;
+  }
+  .slot.locked { border-color: var(--lock); border-width: 2px; padding: calc(0.9rem - 1px) calc(1rem - 1px); }
+  .slot .label { font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase;
+                 letter-spacing: 0.08em; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+  .lockbtn { border: none; background: none; padding: 0 0 0 6px; cursor: pointer;
+             font-size: 0.85rem; opacity: 0.35; transition: opacity 0.15s; }
+  .lockbtn:hover { opacity: 1; background: none; border: none; }
+  .slot.locked .lockbtn { opacity: 1; }
+  .slot .value { font-size: 1rem; margin-top: 0.4rem; min-height: 3.2em; cursor: text;
+                 border-radius: 6px; padding: 2px 4px; margin-left: -4px; }
+  .slot .value:hover { background: var(--accent-soft); }
+  .slot .value.editing { background: var(--accent-soft); outline: 2px solid var(--accent); }
+  .slot .custom-tag { font-family: sans-serif; font-size: 0.65rem; color: var(--lock);
+                      text-transform: uppercase; letter-spacing: 0.06em; display: none; }
+  .slot.custom .custom-tag { display: inline; }
+  .hint { font-family: sans-serif; font-size: 0.78rem; color: var(--muted); margin-bottom: 1.1rem; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button {
+    font-family: sans-serif; font-size: 0.9rem; padding: 0.6rem 1.1rem;
+    border-radius: 8px; border: 1px solid var(--line); background: var(--card);
+    color: var(--ink); cursor: pointer; transition: background 0.15s;
+  }
+  button:hover { background: var(--accent-soft); border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { background: #9c4623; }
+  #timer { font-family: sans-serif; font-size: 0.9rem; color: var(--muted); min-width: 4.5em; }
+  .kill { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.3rem; }
+  .kill label { display: block; margin: 0.45rem 0; cursor: pointer; }
+  .kill input { margin-right: 0.55rem; accent-color: var(--accent); }
+  #verdict { font-family: sans-serif; font-size: 0.85rem; margin-top: 0.7rem; color: var(--muted); }
+  .copied { color: var(--lock) !important; border-color: var(--lock) !important; }
+  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);
+           color: var(--muted); font-size: 0.85rem; }
+  details { margin-bottom: 0.9rem; }
+  summary { cursor: pointer; color: var(--accent); }
+  .editor-cat { margin-top: 1rem; }
+  .editor-cat label { font-family: sans-serif; font-size: 0.75rem; text-transform: uppercase;
+                      letter-spacing: 0.08em; color: var(--muted); display: block; margin-bottom: 0.3rem; }
+  .editor-cat textarea { width: 100%; min-height: 8em; font-family: Georgia, serif; font-size: 0.9rem;
+                         border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem;
+                         background: var(--card); color: var(--ink); resize: vertical; }
+  #editor-msg { font-family: sans-serif; font-size: 0.8rem; color: var(--lock); margin-left: 0.6rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Idea Collider</h1>
+  <p class="tagline">A system for generating project ideas that are original by construction.</p>
+
+  <p>Asking "what could AI do for me?" always converges on the same ideas everyone else has. This system forces combinations you would never choose deliberately, then makes you rescue them. The roll is cheap; <strong>the steelman is the engine.</strong></p>
+
+  <h2>The method</h2>
+  <ol class="steps">
+    <li><strong>Roll a collision.</strong> Randomly combine a niche person, a physical signal, an output medium that isn't an app, and a constraint. You are not allowed to pick, but you may <em>bring</em> one element you're stuck on and let the dice supply the rest.</li>
+    <li><strong>Steelman the stupid.</strong> Spend ten minutes making it work before you may discard it. Find the real problem hiding inside the WHO. Treat the twist as the fix, not the obstacle.</li>
+    <li><strong>The kill test.</strong> If it could appear in a listicle or a startup pitch, kill it and re-roll. Keep only what earns "wait, what?&hairsp;… that's kind of great."</li>
+    <li><strong>Reality check.</strong> Demoable with ~$50 of hardware and AI doing the heavy lifting? Bookmark it.</li>
+  </ol>
+
+  <h2>Roll</h2>
+  <div class="grid" id="slots"></div>
+  <p class="hint">Click the text on any card to type your own and it locks automatically. Click the padlock to lock or unlock. Re-roll fills the rest.</p>
+  <div class="controls">
+    <button class="primary" id="roll">Roll collision</button>
+    <button id="copy">Copy steelman prompt</button>
+    <button id="startTimer">Start 10-min steelman</button>
+    <span id="timer"></span>
+  </div>
+
+  <h2>Kill test</h2>
+  <div class="kill">
+    <label><input type="checkbox" class="kt"> It could <em>not</em> appear in a "top 10 AI project ideas" listicle</label>
+    <label><input type="checkbox" class="kt"> I <em>cannot</em> picture it as a generic startup pitch</label>
+    <label><input type="checkbox" class="kt"> It gets "wait, what?" followed by "…that's kind of great"</label>
+    <label><input type="checkbox" class="kt"> Demoable with ~$50 of hardware, AI doing the heavy lifting</label>
+    <p id="verdict"></p>
+  </div>
+
+  <h2>Keeping it sharp</h2>
+  <p>The WHO column decays fastest. Refill it by lurking niche forums and searching for "why is there no" and "I wish something would": that's where real niche problems hide. Keep entries specific: "people who share a driveway with a neighbour," never "homeowners."</p>
+  <details>
+    <summary>Edit the lists</summary>
+    <div id="editor"></div>
+    <div class="controls" style="margin-top: 0.8rem;">
+      <button id="saveLists">Save lists</button>
+      <button id="resetLists">Reset to defaults</button>
+      <span id="editor-msg"></span>
+    </div>
+    <p style="font-family: sans-serif; font-size: 0.8rem; color: var(--muted); margin-top: 0.8rem;">One entry per line. Saved lists live in this browser (localStorage) and survive reloads. Custom entries you type on a card can be added to your lists when you save.</p>
+  </details>
+
+  <h2>Case files</h2>
+  <p>Three ideas this system has produced, kill-tested and bookmarked. Each is roughly $50 of hardware with AI doing the heavy lifting.</p>
+
+  <details>
+    <summary>Cold Case: a screenless archivist for the chest freezer you fear</summary>
+    <p><em>WHO: people with a chest freezer they fear · SIGNAL: one big button · OUTPUT: thermal receipt printer · TWIST: no screen allowed anywhere.</em></p>
+    <p>Freezer inventory apps fail because nobody types "2 kg of mince, layer 3" with cold wet hands. So: one arcade button on the lid and a mic. Hold the button and say what's going in or out; the AI keeps the inventory, including how deep things are buried. Tap once and a thermal printer answers with a dig ticket: what to eat tonight, and what to dig past to reach it. The freezer becomes a character that gently shames you about the ham.</p>
+    <p>The honest weakness is unlogged removals, fixed with amnesty mode: it periodically prints an audit checklist, you tick it with a pencil and read corrections aloud. About $55 of hardware.</p>
+  </details>
+
+  <details>
+    <summary>The Standing Request: a gatepost flag for cemetery genealogists</summary>
+    <p><em>WHO: cemetery genealogists · SIGNAL: motion in one doorway · OUTPUT: a servo-raised flag · TWIST: hardware under $50.</em></p>
+    <p>Thousands of headstone photo requests sit unfulfilled for years, because the people who do wander into rural cemeteries have no idea anyone needs anything. A small solar-powered box on the gatepost watches the open requests for that cemetery. When motion at the gate says a visitor just walked in, a servo raises a little brass flag: someone, somewhere, needs something only you can do right now. They call the number on the plaque, the AI reads out the names and plot locations, and their phone photos close the loop for a stranger's family tree.</p>
+    <p>About $35 of hardware. The real design problem is rural connectivity, which is exactly what makes it interesting.</p>
+  </details>
+
+  <details>
+    <summary>The Weather House: a wheelchair go/no-go oracle on the fridge</summary>
+    <p><em>WHO: new wheelchair users · SIGNAL: air quality sensor · OUTPUT: a fridge-magnet screen · TWIST: usable by a 90-year-old.</em></p>
+    <p>Most new wheelchair users are older people, and nearly every product built to help them is an app they won't use. A sensor outside their own front door reads their microclimate; inside, a fridge magnet modelled on the old German weather house does the talking. When conditions are good for a wheelchair outing specifically (dry rims, battery-safe temperature, breathable air), the little figure comes out of the house, with one line in big type: "Good until about 2."</p>
+    <p>No app, no buttons, no configuration. Around $45 of hardware, and the AI's whole job is compressing a forecast into one figure and seven words.</p>
+  </details>
+
+  <footer>Part of <a href="https://kmorrison.dev/">kmorrison.dev</a>, Katie Morrison's portfolio of AI-assisted projects. The system itself was designed in collaboration with Claude, which makes it the most meta thing here: a system for having ideas, designed with AI. Use Claude yourself? <a href="collision-brainstorm.skill" download>Download the skill version</a>.</footer>
+</main>
+
+<script>
+const DEFAULTS = {
+  "Who": ["beekeepers","community theatre stage managers","people clearing out a deceased parent's house","marching band directors","volunteer firefighters","cemetery genealogists","food truck owners","piano teachers grading practice","foster parents","houseplant hoarders","people who share a driveway with a neighbour","little league umpires","quilting guilds","home canners and picklers","people who feed neighbourhood cats","garage sale addicts","church potluck organizers","model train club members","new wheelchair users","people with a chest freezer they fear"],
+  "Physical signal": ["weight on a load cell","vibration sensor","door open/close magnet","temperature and humidity","ambient sound in one room","power draw of one appliance","GPS tracker on an object","soil moisture probe","a camera pointed at one fixed thing","RFID/NFC tags on objects","a phone line people can call","air quality sensor","motion in one doorway","water flow on one pipe","a button, literally one big button","tilt/orientation of an object","light level in one spot","a scale under a pet bowl"],
+  "Output (not an app)": ["thermal receipt printer","an old-fashioned phone call","e-ink display on the wall","printed zine mailed monthly","a song generated and played aloud","SMS from a persona","a physical flag raised by a servo","one LED that changes colour","a robocall to someone else","a fridge-magnet sized screen","a printed sticker","a postcard actually mailed","a radio-station-style audio bulletin","a framed 'painting' that changes daily"],
+  "Twist": ["no screen allowed anywhere","must work for someone who can't read","updates only once per day, ever","must be usable by a 90-year-old","total hardware budget under $50","must be funny or it fails","all data deletes itself after 7 days","must work with no internet at the site","the user must never configure anything","output must be beautiful enough to display","must involve two households","must run for a year on batteries"]
+};
+
+const STORAGE_KEY = 'idea-collider-lists';
+let CATEGORIES;
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  CATEGORIES = (saved && Object.keys(DEFAULTS).every(k => Array.isArray(saved[k]) && saved[k].length)) ? saved : structuredClone(DEFAULTS);
+} catch (e) { CATEGORIES = structuredClone(DEFAULTS); }
+
+const names = Object.keys(DEFAULTS);
+const locked = names.map(() => false);
+const isCustom = names.map(() => false);
+const current = names.map(() => '');
+const slotsEl = document.getElementById('slots');
+
+function setLock(i, on) {
+  locked[i] = on;
+  slotsEl.children[i].classList.toggle('locked', on);
+  slotsEl.children[i].querySelector('.lockbtn').textContent = on ? '\u{1F512}' : '\u{1F513}';
+}
+
+names.forEach((name, i) => {
+  const div = document.createElement('div');
+  div.className = 'slot';
+  div.innerHTML = '<div class="label"><span>' + name + ' <span class="custom-tag">yours</span></span>' +
+    '<button class="lockbtn" title="Lock / unlock" aria-label="Lock ' + name + '">\u{1F513}</button></div>' +
+    '<div class="value" title="Click to type your own"></div>';
+  div.querySelector('.lockbtn').addEventListener('click', () => setLock(i, !locked[i]));
+  const valueEl = div.querySelector('.value');
+  valueEl.addEventListener('click', () => {
+    if (valueEl.classList.contains('editing')) return;
+    valueEl.classList.add('editing');
+    valueEl.contentEditable = 'true';
+    valueEl.focus();
+    document.execCommand && document.execCommand('selectAll', false, null);
+  });
+  const commit = () => {
+    valueEl.contentEditable = 'false';
+    valueEl.classList.remove('editing');
+    const text = valueEl.textContent.trim();
+    if (text && text !== current[i]) {
+      current[i] = text;
+      isCustom[i] = !CATEGORIES[name].includes(text);
+      div.classList.toggle('custom', isCustom[i]);
+      setLock(i, true);
+    } else {
+      valueEl.textContent = current[i];
+    }
+  };
+  valueEl.addEventListener('blur', commit);
+  valueEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); valueEl.blur(); }
+    if (e.key === 'Escape') { valueEl.textContent = current[i]; valueEl.blur(); }
+  });
+  slotsEl.appendChild(div);
+});
+
+function roll() {
+  names.forEach((name, i) => {
+    if (locked[i]) return;
+    current[i] = CATEGORIES[name][Math.floor(Math.random() * CATEGORIES[name].length)];
+    isCustom[i] = false;
+    slotsEl.children[i].classList.remove('custom');
+    slotsEl.children[i].querySelector('.value').textContent = current[i];
+  });
+  document.querySelectorAll('.kt').forEach(cb => cb.checked = false);
+  verdict();
+}
+document.getElementById('roll').addEventListener('click', roll);
+
+const copyBtn = document.getElementById('copy');
+copyBtn.addEventListener('click', () => {
+  const parts = names.map((n, i) => n.toUpperCase() + ': ' + current[i] + (isCustom[i] ? ' (my own starting point)' : ''));
+  const text = 'Steelman this collision into a real portfolio project: ' + parts.join(' | ') +
+    '. Spend real effort making it work before judging it: find the real problem hiding in the WHO, and treat the TWIST as the fix, not the obstacle. Then apply the kill test: if it could appear in an AI-project listicle or a startup pitch, kill it.';
+  navigator.clipboard.writeText(text).then(() => {
+    copyBtn.textContent = 'Copied. Paste into any AI chat';
+    copyBtn.classList.add('copied');
+    setTimeout(() => { copyBtn.textContent = 'Copy steelman prompt'; copyBtn.classList.remove('copied'); }, 2500);
+  });
+});
+
+let timerId = null;
+const timerEl = document.getElementById('timer');
+document.getElementById('startTimer').addEventListener('click', () => {
+  clearInterval(timerId);
+  let remaining = 600;
+  const tick = () => {
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    timerEl.textContent = m + ':' + String(s).padStart(2, '0');
+    if (remaining-- <= 0) { clearInterval(timerId); timerEl.textContent = 'Judge it.'; }
+  };
+  tick();
+  timerId = setInterval(tick, 1000);
+});
+
+function verdict() {
+  const boxes = [...document.querySelectorAll('.kt')];
+  const n = boxes.filter(b => b.checked).length;
+  const v = document.getElementById('verdict');
+  if (n === 0) v.textContent = '';
+  else if (n < 4) v.textContent = n + '/4. Not yet. Keep steelmanning, or kill it and re-roll. A kill is a healthy outcome.';
+  else v.textContent = '4/4. Pass. Bookmark it: name it, write the problem, the concept, the honest weakness, and the portfolio angle.';
+}
+document.querySelectorAll('.kt').forEach(cb => cb.addEventListener('change', verdict));
+
+const editorEl = document.getElementById('editor');
+function renderEditor() {
+  editorEl.innerHTML = '';
+  names.forEach(name => {
+    const wrap = document.createElement('div');
+    wrap.className = 'editor-cat';
+    const label = document.createElement('label');
+    label.textContent = name;
+    const ta = document.createElement('textarea');
+    ta.dataset.cat = name;
+    ta.value = CATEGORIES[name].join('\n');
+    wrap.appendChild(label);
+    wrap.appendChild(ta);
+    editorEl.appendChild(wrap);
+  });
+}
+renderEditor();
+
+document.getElementById('saveLists').addEventListener('click', () => {
+  const next = {};
+  let ok = true;
+  editorEl.querySelectorAll('textarea').forEach(ta => {
+    const entries = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!entries.length) ok = false;
+    next[ta.dataset.cat] = entries;
+  });
+  names.forEach((name, i) => {
+    if (isCustom[i] && current[i] && !next[name].includes(current[i])) next[name].push(current[i]);
+  });
+  const msg = document.getElementById('editor-msg');
+  if (!ok) { msg.textContent = 'Each list needs at least one entry.'; return; }
+  CATEGORIES = next;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(CATEGORIES));
+  renderEditor();
+  msg.textContent = 'Saved (custom card entries included).';
+  setTimeout(() => msg.textContent = '', 3000);
+});
+
+document.getElementById('resetLists').addEventListener('click', () => {
+  CATEGORIES = structuredClone(DEFAULTS);
+  localStorage.removeItem(STORAGE_KEY);
+  renderEditor();
+  const msg = document.getElementById('editor-msg');
+  msg.textContent = 'Back to defaults.';
+  setTimeout(() => msg.textContent = '', 3000);
+});
+
+roll();
+</script>
+</body>
+</html>

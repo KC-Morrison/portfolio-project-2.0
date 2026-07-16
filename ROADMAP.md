@@ -22,7 +22,7 @@ Handover document for iterating on `index.html` (kmorrison.dev). Written to be h
 Everything here needs input from Katie. Slot content in without changing structure.
 
 1. **Photo.** DONE: hero photo in place as `katie.webp` (800x800 square) with `katie.jpg` fallback, EXIF stripped, `fetchpriority="high"`, alt text with no employer reference. Source file is `assets/source/BINADW KM 7.jpg` (5371x3581) if recrops are ever needed.
-2. **Personal projects.** Replace the two dashed `.fun-card` placeholders with real content: what it is, what it does, what made it fun, plus a link or screenshot if shareable. Remove the dashed border once real (it signals "placeholder").
+2. **Personal projects.** DONE: six real `.fun-card` entries (Idea Collider, Memory Line, HOULP!, Gym Coach, Blob Runner, pixel sprite lab), dashed borders removed. Each links to a live, playable single-file version in its own repo subfolder: `collider/`, `memory-line/`, `houlp/`, `gym-coach/`, `blob-runner/`, `drawing-playground/`. All were checked for employer identifiers and personal data before publishing; the Memory Line page is a demo with invented stories because the real line is private to the family.
 3. **Case study.** Replace the drafted Claude + Obsidian article in the `<details class="post">` body with Katie's own write-up. Check it for identifying details before publishing.
 4. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
 
