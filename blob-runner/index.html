@@ -224,6 +224,21 @@
       height: 10px;
       background: #8b2252;
     }
+    /* Full-width console on phones */
+    @media (max-width: 480px) {
+      body { padding: 0; }
+      #game {
+        max-width: none;
+        width: 100%;
+        min-height: 100%;
+        border-radius: 0;
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      #game::before, #game::after { border-radius: 0; }
+    }
   </style>
 </head>
 <body>
@@ -247,9 +262,9 @@
         <label><input type="checkbox" id="snd-death" checked onclick="event.stopPropagation()"> DEATH</label>
       </div>
     </div>
+    <p onclick="event.stopPropagation()" style="position:relative; z-index:1; text-align:center; font-size:10px; color:#77776f; margin-top:14px;">A personal project by <a href="https://kmorrison.dev/" style="color:#66665f;">Katie Morrison</a>, built with AI as a single HTML file.</p>
     <div class="grip-lines"></div>
   </div>
-  <p style="text-align:center; font-size:11px; color:#666; margin-top:22px;">A personal project by <a href="https://kmorrison.dev/" style="color:#888;">Katie Morrison</a>, built with AI as a single HTML file.</p>
 
 <script>
 const canvas = document.getElementById('canvas');
