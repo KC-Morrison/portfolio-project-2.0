@@ -162,6 +162,84 @@
   .tag.ai{color:var(--accent-deep);background:rgba(180,85,45,.1);}
   .outcome{color:var(--ink);font-weight:500;}
 
+  /* ---------- spend tracker demo ----------
+     Lives inside work card 03. The card's hover lift is disabled on that card
+     (.card--demo) because a transformed ancestor becomes the containing block
+     for position:fixed children, which would break the drag. */
+  .card--demo:hover{transform:none;}
+  .sd{grid-column:1/-1;margin-top:26px;padding-top:24px;border-top:1px solid var(--line);}
+  @media(max-width:600px){.sd{grid-column:auto;}}
+  .sd-lead{font-size:.88rem;color:var(--ink-soft);margin-bottom:16px;}
+  .sd-lead b{color:var(--ink);}
+  .sd-windows{display:grid;grid-template-columns:0.8fr 1.2fr;gap:16px;align-items:start;}
+  @media(max-width:700px){.sd-windows{grid-template-columns:1fr;}}
+  .sd-win{background:var(--cream);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .sd-bar{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--cream-deep);border-bottom:1px solid var(--line);}
+  .sd-dots{display:flex;gap:4px;flex-shrink:0;}
+  .sd-dots i{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .sd-name{font-size:.7rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);}
+  .sd-body{padding:14px;}
+
+  /* Two columns so four files always read as a tidy folder, at every width. */
+  .sd-files{list-style:none;display:grid;grid-template-columns:repeat(2,78px);gap:6px;justify-content:start;}
+  .sd-slot{width:78px;min-height:74px;}
+  .sd-file{
+    width:78px;background:none;border:0;border-radius:8px;padding:6px 2px;
+    font-family:var(--sans);font-size:.66rem;line-height:1.3;color:var(--ink-soft);
+    text-align:center;cursor:pointer;touch-action:manipulation;
+  }
+  .sd-file svg{display:block;margin:0 auto 4px;}
+  .sd-file:hover{background:var(--cream-deep);}
+  .sd-file:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .sd-file.is-gone{visibility:hidden;}
+  .sd-file.is-drag,.sd-file.is-fly{
+    position:fixed;z-index:60;margin:0;background:var(--card);
+    box-shadow:0 10px 26px rgba(46,40,35,.22);cursor:grabbing;
+  }
+  .sd-file.is-fly{transition:transform .5s cubic-bezier(.4,0,.2,1),opacity .5s;}
+  .sd-empty{font-size:.8rem;color:var(--ink-soft);padding:6px 2px;}
+  .sd-link{
+    background:none;border:0;padding:0;font-family:var(--sans);font-size:inherit;
+    font-weight:700;color:var(--accent-deep);border-bottom:2px solid var(--accent);cursor:pointer;
+  }
+  .sd-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .sd-drop{
+    border:2px dashed var(--line);border-radius:10px;padding:14px 10px;
+    text-align:center;font-size:.78rem;color:var(--ink-soft);margin-bottom:14px;transition:.15s;
+  }
+  .sd-drop.is-over{border-color:var(--accent);background:rgba(180,85,45,.07);color:var(--accent-deep);}
+  .sd-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .sd-stat{background:var(--green);color:var(--cream);border-radius:10px;padding:9px 12px;}
+  .sd-stat .l{font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;opacity:.85;}
+  /* Clamp so "$2,541.00" cannot overflow the tile in a 360px card. */
+  .sd-stat .v{font-family:var(--serif);font-size:clamp(1rem,3.6vw,1.2rem);line-height:1.25;}
+  .sd-sites{margin-bottom:14px;}
+  .sd-site{display:grid;grid-template-columns:48px 1fr 62px;gap:8px;align-items:center;font-size:.72rem;color:var(--ink-soft);margin-bottom:6px;}
+  .sd-site:last-child{margin-bottom:0;}
+  .sd-track{height:8px;background:var(--cream-deep);border-radius:999px;overflow:hidden;}
+  .sd-fill{display:block;height:100%;width:0;background:var(--green);border-radius:999px;transition:width .45s ease;}
+  .sd-site .a{text-align:right;white-space:nowrap;}
+  .sd table{width:100%;border-collapse:collapse;font-size:.73rem;}
+  .sd th{
+    text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);color:var(--ink);
+    font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  }
+  .sd td{padding:6px;border-bottom:1px solid var(--line);color:var(--ink-soft);}
+  .sd tbody tr:last-child td{border-bottom:0;}
+  .sd th.n,.sd td.n{text-align:right;white-space:nowrap;}
+  .sd .sd-none td{text-align:center;font-style:italic;color:#9C9288;padding:14px;}
+  .sd-flag{
+    margin-top:12px;padding:10px 12px;border-left:3px solid var(--accent);
+    background:rgba(180,85,45,.08);border-radius:0 8px 8px 0;
+    font-size:.76rem;color:var(--accent-deep);
+  }
+  .sd-note{margin-top:14px;font-size:.72rem;color:var(--ink-soft);font-style:italic;}
+  @media(prefers-reduced-motion:reduce){
+    .sd-file.is-fly{transition:none;}
+    .sd-fill{transition:none;}
+  }
+
   /* ---------- fun cards ---------- */
   .fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:36px;}
   @media(max-width:640px){.fun-grid{grid-template-columns:1fr;}}
@@ -288,13 +366,62 @@
         </div>
       </article>
 
-      <article class="card">
+      <article class="card card--demo">
         <div class="card-num">03</div>
         <div>
           <span class="tag ai">Automation</span><span class="tag">Financial control</span>
           <h3>A spend tracker that changed the conversation</h3>
           <p>Nobody was tracking spend against one contractor, so overspend only surfaced after the fact. I built a tool that reads each invoice as you drop it in, pulls out the site and the amounts, and keeps a running total. One file, run locally, so no financial data leaves us.</p>
           <p class="outcome">I used it to flag July's overspend, and for the first time we had a constructive conversation about it. Call outs now need approval before they happen.</p>
+        </div>
+
+        <div class="sd" id="sd">
+          <p class="sd-lead" id="sd-lead"><b>Have a go.</b> Tap an invoice to send it across to the tracker.</p>
+          <div class="sd-windows">
+
+            <div class="sd-win">
+              <div class="sd-bar">
+                <span class="sd-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="sd-name" id="sd-folder">Invoices (4)</span>
+              </div>
+              <div class="sd-body">
+                <ul class="sd-files" id="sd-files">
+                  <li class="sd-slot"><button type="button" class="sd-file" data-id="INV-0141"><svg width="30" height="36" viewBox="0 0 30 36" aria-hidden="true" focusable="false"><path d="M4 1h13l9 9v25a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z" fill="#FFFFFF" stroke="#E4D9CB" stroke-width="1.5"/><path d="M17 1v9h9" fill="none" stroke="#E4D9CB" stroke-width="1.5"/><text x="14" y="28" font-family="Karla,sans-serif" font-size="7.5" font-weight="700" fill="#B4552D" text-anchor="middle">PDF</text></svg>INV-0141</button></li>
+                  <li class="sd-slot"><button type="button" class="sd-file" data-id="INV-0142"><svg width="30" height="36" viewBox="0 0 30 36" aria-hidden="true" focusable="false"><path d="M4 1h13l9 9v25a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z" fill="#FFFFFF" stroke="#E4D9CB" stroke-width="1.5"/><path d="M17 1v9h9" fill="none" stroke="#E4D9CB" stroke-width="1.5"/><text x="14" y="28" font-family="Karla,sans-serif" font-size="7.5" font-weight="700" fill="#B4552D" text-anchor="middle">PDF</text></svg>INV-0142</button></li>
+                  <li class="sd-slot"><button type="button" class="sd-file" data-id="INV-0143"><svg width="30" height="36" viewBox="0 0 30 36" aria-hidden="true" focusable="false"><path d="M4 1h13l9 9v25a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z" fill="#FFFFFF" stroke="#E4D9CB" stroke-width="1.5"/><path d="M17 1v9h9" fill="none" stroke="#E4D9CB" stroke-width="1.5"/><text x="14" y="28" font-family="Karla,sans-serif" font-size="7.5" font-weight="700" fill="#B4552D" text-anchor="middle">PDF</text></svg>INV-0143</button></li>
+                  <li class="sd-slot"><button type="button" class="sd-file" data-id="INV-0144"><svg width="30" height="36" viewBox="0 0 30 36" aria-hidden="true" focusable="false"><path d="M4 1h13l9 9v25a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z" fill="#FFFFFF" stroke="#E4D9CB" stroke-width="1.5"/><path d="M17 1v9h9" fill="none" stroke="#E4D9CB" stroke-width="1.5"/><text x="14" y="28" font-family="Karla,sans-serif" font-size="7.5" font-weight="700" fill="#B4552D" text-anchor="middle">PDF</text></svg>INV-0144</button></li>
+                </ul>
+                <p class="sd-empty" id="sd-done" hidden>All four read. <button type="button" class="sd-link" id="sd-reset">Put them back</button></p>
+              </div>
+            </div>
+
+            <div class="sd-win">
+              <div class="sd-bar">
+                <span class="sd-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="sd-name">Spend tracker</span>
+              </div>
+              <div class="sd-body">
+                <div class="sd-drop" id="sd-drop">Drop an invoice here</div>
+                <div class="sd-stats">
+                  <div class="sd-stat"><div class="l">Total spend</div><div class="v" id="sd-total">$0.00</div></div>
+                  <div class="sd-stat"><div class="l">Invoices</div><div class="v" id="sd-count">0</div></div>
+                </div>
+                <div class="sd-sites">
+                  <div class="sd-site"><span>Site A</span><span class="sd-track"><span class="sd-fill" id="sd-barA"></span></span><span class="a" id="sd-amtA">$0.00</span></div>
+                  <div class="sd-site"><span>Site B</span><span class="sd-track"><span class="sd-fill" id="sd-barB"></span></span><span class="a" id="sd-amtB">$0.00</span></div>
+                  <div class="sd-site"><span>Site C</span><span class="sd-track"><span class="sd-fill" id="sd-barC"></span></span><span class="a" id="sd-amtC">$0.00</span></div>
+                </div>
+                <table>
+                  <thead><tr><th>Invoice</th><th>Site</th><th class="n">Amount</th></tr></thead>
+                  <tbody id="sd-rows"><tr class="sd-none"><td colspan="3">Nothing read yet</td></tr></tbody>
+                </table>
+                <p class="sd-flag" id="sd-flag" hidden></p>
+                <p class="sd-status" id="sd-status" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;"></p>
+              </div>
+            </div>
+
+          </div>
+          <p class="sd-note">A demonstration with invented invoices. The real one reads the actual PDFs and never leaves my machine.</p>
         </div>
       </article>
 
@@ -409,6 +536,209 @@
 <footer>
   <p>Katie Morrison · Operations &amp; technology in the not-for-profit sector</p>
 </footer>
+
+<script>
+/* Spend tracker demo, work card 03.
+   Invented data only: no contractor, no real sites, no real amounts.
+   Mouse users can drag a file onto the dropzone. Touch and keyboard users
+   activate the button and the file animates across on its own. */
+(function(){
+  var sd = document.getElementById('sd');
+  if(!sd) return;
+
+  /* Never let a missing matchMedia disable the whole demo. */
+  function mq(q){
+    try{ return !!(window.matchMedia && window.matchMedia(q).matches); }catch(err){ return false; }
+  }
+
+  var DATA = [
+    {id:'INV-0141', month:'Jun', site:'A', work:'Grounds tidy and rubbish removal', amt:528},
+    {id:'INV-0142', month:'Jul', site:'B', work:'Council clean up',                 amt:396},
+    {id:'INV-0143', month:'Jul', site:'A', work:'Pressure wash and bin area',       amt:913},
+    {id:'INV-0144', month:'Jul', site:'C', work:'After hours call out',             amt:704}
+  ];
+  var AVERAGE = 1500;
+  var DROP_TEXT = 'Drop an invoice here';
+
+  var files  = document.getElementById('sd-files');
+  var drop   = document.getElementById('sd-drop');
+  var flag   = document.getElementById('sd-flag');
+  var rows   = document.getElementById('sd-rows');
+  var done   = document.getElementById('sd-done');
+  var reset  = document.getElementById('sd-reset');
+  var lead   = document.getElementById('sd-lead');
+  var folder = document.getElementById('sd-folder');
+  var status = document.getElementById('sd-status');
+  var elTotal = document.getElementById('sd-total');
+  var elCount = document.getElementById('sd-count');
+
+  var taken = [];
+  var dropTimer = null;
+  var reduced = mq('(prefers-reduced-motion: reduce)');
+
+  if(mq('(pointer: fine)')){
+    lead.innerHTML = '<b>Have a go.</b> Drag an invoice onto the tracker, or just click one.';
+  }
+
+  function money(n){
+    return '$' + n.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function recOf(btn){
+    for(var i=0;i<DATA.length;i++){ if(DATA[i].id === btn.getAttribute('data-id')) return DATA[i]; }
+    return null;
+  }
+  function esc(s){
+    return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; });
+  }
+
+  function render(){
+    var kept = DATA.filter(function(d){ return taken.indexOf(d.id) > -1; });
+
+    rows.innerHTML = kept.length
+      ? kept.map(function(r){
+          return '<tr><td>' + esc(r.id) + '</td><td>Site ' + esc(r.site) +
+                 '</td><td class="n">' + money(r.amt) + '</td></tr>';
+        }).join('')
+      : '<tr class="sd-none"><td colspan="3">Nothing read yet</td></tr>';
+
+    var total = kept.reduce(function(s,r){ return s + r.amt; }, 0);
+    elTotal.textContent = money(total);
+    elCount.textContent = kept.length;
+    folder.textContent = 'Invoices (' + (DATA.length - kept.length) + ')';
+
+    var by = {A:0, B:0, C:0};
+    kept.forEach(function(r){ by[r.site] += r.amt; });
+    var max = Math.max(1, by.A, by.B, by.C);
+    ['A','B','C'].forEach(function(k){
+      document.getElementById('sd-bar' + k).style.width = (by[k] / max * 100) + '%';
+      document.getElementById('sd-amt' + k).textContent = money(by[k]);
+    });
+
+    var july = kept.filter(function(r){ return r.month === 'Jul'; });
+    var jt = july.reduce(function(s,r){ return s + r.amt; }, 0);
+    if(jt > AVERAGE){
+      flag.hidden = false;
+      flag.textContent = 'Flagged: July is at ' + money(jt) + ' across ' + july.length +
+        ' invoices, ' + money(jt - AVERAGE) + ' above the ' + money(AVERAGE) + ' monthly average.';
+    } else {
+      flag.hidden = true;
+      flag.textContent = '';
+    }
+
+    done.hidden = kept.length !== DATA.length;
+  }
+
+  function accept(rec, btn){
+    if(!rec || taken.indexOf(rec.id) > -1) return;
+    taken.push(rec.id);
+    btn.classList.add('is-gone');
+    drop.classList.remove('is-over');
+    drop.textContent = 'Read ' + rec.id + ': Site ' + rec.site + ', ' + money(rec.amt);
+    status.textContent = rec.id + ' added. ' + rec.work + ', Site ' + rec.site + ', ' + money(rec.amt) + '.';
+    clearTimeout(dropTimer);
+    dropTimer = setTimeout(function(){ drop.textContent = DROP_TEXT; }, 2000);
+    render();
+  }
+
+  /* Send a file across on its own, for tap and keyboard. */
+  function fly(btn, rec){
+    if(reduced){ accept(rec, btn); return; }
+    var a = btn.getBoundingClientRect();
+    var b = drop.getBoundingClientRect();
+    btn.classList.add('is-fly');
+    btn.style.left  = a.left + 'px';
+    btn.style.top   = a.top + 'px';
+    btn.style.width = a.width + 'px';
+    btn.getBoundingClientRect();
+    drop.classList.add('is-over');
+    btn.style.transform = 'translate(' + ((b.left + b.width/2) - (a.left + a.width/2)) + 'px,' +
+                          ((b.top + b.height/2) - (a.top + a.height/2)) + 'px) scale(.6)';
+    btn.style.opacity = '0';
+    setTimeout(function(){
+      btn.classList.remove('is-fly');
+      btn.removeAttribute('style');
+      accept(rec, btn);
+    }, 500);
+  }
+
+  /* Mouse drag. Touch is deliberately excluded so the page can still scroll. */
+  var dragBtn = null, dragRec = null, origin = null, offX = 0, offY = 0, moved = false, swallowClick = false;
+
+  function overDrop(x, y){
+    var d = drop.getBoundingClientRect();
+    return x >= d.left && x <= d.right && y >= d.top && y <= d.bottom;
+  }
+  function endDrag(btn){
+    btn.classList.remove('is-drag');
+    btn.removeAttribute('style');
+    drop.classList.remove('is-over');
+    dragBtn = null;
+  }
+
+  files.addEventListener('pointerdown', function(e){
+    if(e.pointerType !== 'mouse' || e.button !== 0) return;
+    var btn = e.target.closest ? e.target.closest('.sd-file') : null;
+    if(!btn || btn.classList.contains('is-gone')) return;
+    e.preventDefault();
+    dragBtn = btn;
+    dragRec = recOf(btn);
+    moved = false;
+    origin = btn.getBoundingClientRect();
+    offX = e.clientX - origin.left;
+    offY = e.clientY - origin.top;
+    btn.classList.add('is-drag');
+    btn.style.left  = origin.left + 'px';
+    btn.style.top   = origin.top + 'px';
+    btn.style.width = origin.width + 'px';
+    try{ btn.setPointerCapture(e.pointerId); }catch(err){}
+  });
+
+  document.addEventListener('pointermove', function(e){
+    if(!dragBtn) return;
+    var dx = e.clientX - offX - origin.left;
+    var dy = e.clientY - offY - origin.top;
+    if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+    dragBtn.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    drop.classList.toggle('is-over', overDrop(e.clientX, e.clientY));
+  });
+
+  document.addEventListener('pointerup', function(e){
+    if(!dragBtn) return;
+    var btn = dragBtn, rec = dragRec, hit = overDrop(e.clientX, e.clientY);
+    swallowClick = moved;
+    endDrag(btn);
+    if(hit) accept(rec, btn);
+  });
+
+  document.addEventListener('pointercancel', function(){
+    if(dragBtn) endDrag(dragBtn);
+  });
+
+  /* Tap, click without dragging, and keyboard activation. */
+  files.addEventListener('click', function(e){
+    if(swallowClick){ swallowClick = false; return; }
+    var btn = e.target.closest ? e.target.closest('.sd-file') : null;
+    if(!btn || btn.classList.contains('is-gone')) return;
+    fly(btn, recOf(btn));
+  });
+
+  reset.addEventListener('click', function(){
+    taken = [];
+    clearTimeout(dropTimer);
+    drop.textContent = DROP_TEXT;
+    status.textContent = 'Tracker cleared.';
+    Array.prototype.forEach.call(files.querySelectorAll('.sd-file'), function(b){
+      b.classList.remove('is-gone', 'is-fly', 'is-drag');
+      b.removeAttribute('style');
+    });
+    render();
+    var first = files.querySelector('.sd-file');
+    if(first) first.focus();
+  });
+
+  render();
+})();
+</script>
 
 </body>
 </html>

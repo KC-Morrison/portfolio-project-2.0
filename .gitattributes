@@ -1,0 +1,18 @@
+# Line ending policy.
+#
+# Store text files with LF in the repository and check them out with the
+# line endings native to whichever machine you are on. Without this, a
+# OneDrive sync round trip can flip every file to Windows CRLF and make
+# git report the whole repo as modified when nothing has actually changed.
+* text=auto
+
+# Files that must never be treated as text. Line ending conversion would
+# corrupt them. The .skill file is a zip archive, so it belongs here too.
+*.skill binary
+*.jpg   binary
+*.jpeg  binary
+*.png   binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary

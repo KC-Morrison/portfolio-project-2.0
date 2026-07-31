@@ -31,7 +31,11 @@ Everything here needs input from Katie. Slot content in without changing structu
    - Card 01 reviewed by Katie and confirmed accurate. No change.
    - Card 04 rewritten. It previously claimed she led the network upgrade and owned it "end to end" including quotes and vendor negotiation. In fact her manager set the project up and handles commercials; Katie is deputy, covering the on-site audit, staff coordination, day to day vendor contact and the incumbent IT provider handover. Tag changed from "Project lead" to "Coordination".
    - **Accuracy review now complete** for all four cards. Re-check any card whose underlying project changes.
-5. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
+5. **Card 03 interactive demo.** DONE 31 Jul 2026: an inline two-window demo sits inside work card 03 (`.card--demo`, markup id `sd`). A folder window holds four invoice files; the tracker window has a dropzone, two stat tiles, three site bars, a running table and a July overspend flag. Mouse users drag a file onto the dropzone; touch and keyboard users activate the button and the file animates across on its own. Adds roughly 6 KB to `index.html`, no dependencies.
+   - **All data is invented.** No contractor name, no real site names, no real amounts, no employer branding. Site labels are Site A, B and C. The demo is labelled in the copy as a demonstration so it is not read as live data. Keep it that way if the demo is ever extended.
+   - The demo is rendered in the portfolio palette, not the employer's brand colours. Those colours are themselves an identifier, so do not import them.
+   - Behaviour was verified headlessly with jsdom: totals, per-site bars, folder count, the flag threshold, repeat-activation guarding and reset all behave. Not yet verified visually in a browser.
+6. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
 
 **Acceptance:** no bracketed `[Katie to supply]` text remains anywhere on the page.
 
@@ -81,3 +85,6 @@ Everything here needs input from Katie. Slot content in without changing structu
 - After every iteration, re-run the three checks: no em dashes in copy, no US spellings in copy (CSS keywords excepted), no employer identifiers anywhere.
 - When in doubt on tone, cut words rather than add them.
 - Card 03 (contractor spend tracker) deliberately names neither the contractor nor the sites. The site labels on those invoices are employer identifiers, so keep them out if the card is ever expanded into a case study.
+- A transformed ancestor becomes the containing block for `position:fixed` descendants. The card hover lift (`.card:hover{transform:translateY(-3px)}`) would therefore trap the dragged file inside card 03, so the lift is switched off on that one card via `.card--demo:hover{transform:none;}`. Do not remove that rule, and watch for the same trap if a transform is ever added to `section`, `.wrap` or `.cards`.
+- Do not gate a feature on `window.matchMedia` existing. An early version of the demo bailed out entirely when it was absent, which silently disabled the whole thing. Feature queries now go through a small `mq()` helper that returns false rather than throwing.
+- Both files in this repo use CRLF line endings, and the footer separator is a literal middot rather than `&middot;`. Match the existing bytes when doing find-and-replace or edits will miss.
