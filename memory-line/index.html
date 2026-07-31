@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Memory Line · a voicemail line for family stories</title>
+<meta name="description" content="Call a phone number, leave a memory, and it appears on a family website. A demo of the system with invented stories.">
+<link rel="canonical" href="https://kmorrison.dev/memory-line/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF5EE'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23B4552D' text-anchor='middle'%3EKM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF5EE; --cream-deep:#F3EADF; --ink:#2E2823; --ink-soft:#5C534A;
+    --accent:#B4552D; --accent-deep:#8F3F1E; --green:#3E5C4B;
+    --card:#FFFFFF; --line:#E4D9CB; --radius:18px;
+    --serif:'Fraunces', Georgia, serif; --sans:'Karla', -apple-system, 'Segoe UI', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent-deep);}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px;}
+  header{padding:64px 0 8px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,6vw,2.8rem);line-height:1.15;}
+  h1 em{font-style:italic;color:var(--accent);}
+  .tagline{color:var(--ink-soft);font-size:1.1rem;margin-top:10px;max-width:34em;}
+  .demo-note{
+    display:inline-block;margin-top:18px;background:var(--cream-deep);
+    border:1px solid var(--line);border-radius:999px;padding:6px 16px;
+    font-size:.82rem;color:var(--ink-soft);
+  }
+  .demo-note b{color:var(--accent);}
+  h2{font-family:var(--serif);font-weight:500;font-size:1.5rem;margin-bottom:18px;}
+  .kicker{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;}
+  section{padding:44px 0 8px;}
+
+  /* how it works */
+  .steps{display:grid;gap:12px;counter-reset:s;}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px 16px 58px;position:relative;color:var(--ink-soft);font-size:.97rem;
+  }
+  .step::before{
+    counter-increment:s;content:counter(s);
+    position:absolute;left:16px;top:16px;width:28px;height:28px;border-radius:50%;
+    background:rgba(180,85,45,.1);color:var(--accent);font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  }
+  .step b{color:var(--ink);}
+
+  /* feed */
+  .vm{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin-bottom:14px;
+  }
+  .vm-top{display:flex;align-items:center;gap:14px;}
+  .vm-play{
+    flex-shrink:0;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--accent);color:var(--cream);font-size:1.05rem;
+    display:flex;align-items:center;justify-content:center;transition:background .2s;
+  }
+  .vm-play:hover{background:var(--accent-deep);}
+  .vm-play.playing{background:var(--green);}
+  .vm-who{flex:1;min-width:0;}
+  .vm-name{font-family:var(--serif);font-size:1.15rem;color:var(--ink);}
+  .vm-meta{font-size:.8rem;color:var(--ink-soft);margin-top:2px;}
+  .vm-bar{height:4px;background:var(--cream-deep);border-radius:99px;margin-top:16px;overflow:hidden;display:none;}
+  .vm.playing .vm-bar{display:block;}
+  .vm-bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s linear;}
+  .vm-transcript{
+    display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);
+    color:var(--ink-soft);font-size:.95rem;font-style:italic;
+  }
+  .vm.open .vm-transcript{display:block;}
+  .vm-toggle{
+    background:none;border:none;cursor:pointer;color:var(--accent-deep);
+    font-family:var(--sans);font-size:.82rem;font-weight:700;padding:0;margin-top:10px;
+    border-bottom:1px solid var(--accent);
+  }
+
+  /* prompts */
+  .prompts{background:var(--cream-deep);border-radius:var(--radius);padding:28px;margin-top:8px;}
+  .prompt{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 16px;margin-bottom:10px;font-size:.95rem;color:var(--ink-soft);
+    display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+  }
+  .prompt .by{font-size:.75rem;color:var(--accent);white-space:nowrap;font-weight:700;}
+  .prompt-form{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .prompt-form input{
+    flex:1;min-width:220px;border:1px solid var(--line);border-radius:999px;
+    padding:11px 18px;font-family:var(--sans);font-size:.95rem;background:var(--card);color:var(--ink);
+  }
+  .prompt-form input:focus{outline:2px solid var(--accent);border-color:var(--accent);}
+  .prompt-form button{
+    border:none;border-radius:999px;background:var(--accent);color:var(--cream);
+    font-family:var(--sans);font-weight:700;font-size:.95rem;padding:11px 22px;cursor:pointer;
+  }
+  .prompt-form button:hover{background:var(--accent-deep);}
+  .prompts .hint{font-size:.78rem;color:var(--ink-soft);margin-top:12px;}
+
+  footer{
+    margin-top:64px;padding:34px 24px;background:var(--green);color:#D5E0D6;
+    text-align:center;font-size:.88rem;
+  }
+  footer a{color:#fff;}
+  @media (prefers-reduced-motion: reduce){ .vm-bar i{transition:none;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="kicker">A personal project</p>
+    <h1>The Memory Line: <em>leave a message after the beep</em></h1>
+    <p class="tagline">A phone number my family can call to leave a story. Every voicemail lands on a private website that collects them all, newest first. The least technical people I love can use it, because everyone already knows how to leave a voicemail.</p>
+    <p class="demo-note"><b>This is a demo.</b> The real line and its stories are private to my family. The voices below are invented, read aloud by your browser.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">How the real one works</p>
+    <h2>Four moving parts, no app to install</h2>
+    <div class="steps">
+      <div class="step"><b>Call the number.</b> A Twilio phone number answers with a warm greeting and a beep. No login, no smartphone required; the family landline works fine.</div>
+      <div class="step"><b>Tell your story.</b> The recording is saved automatically as an audio file into a folder on my cloud drive. Nothing to upload, nothing to remember.</div>
+      <div class="step"><b>The site collects it.</b> A small website I built reads that folder and surfaces every message in chronological order, like a family album that answers the phone.</div>
+      <div class="step"><b>The family steers it.</b> A second page collects story prompts from the family, so the next caller always has something to talk about.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The feed, recreated</p>
+    <h2>Latest messages</h2>
+    <div id="feed"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="kicker">The prompts page, recreated</p>
+    <h2>What should we ask next?</h2>
+    <div class="prompts">
+      <div id="promptList"></div>
+      <form class="prompt-form" id="promptForm">
+        <input type="text" id="promptInput" placeholder="Add a story prompt..." maxlength="140" aria-label="Add a story prompt">
+        <button type="submit">Add prompt</button>
+      </form>
+      <p class="hint">In this demo your prompt stays in your browser. On the real site, it goes to the whole family.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>The Memory Line is a personal project by <a href="https://kmorrison.dev/">Katie Morrison</a>, built with AI: a Twilio number, a cloud drive, and a small website. This demo is a single self-contained HTML file with invented stories.</p>
+</footer>
+
+<script>
+const VOICEMAILS = [
+  { name:"Nan", meta:"2 min 14 sec · Tuesday evening",
+    text:"You want to know how I met your Pop? At the dance hall, and I did not like him one bit. He trod on my foot twice and blamed the band. Then he walked four miles home in the rain because he'd given his bus fare to my sister. That's when I knew. Sixty-one years, and he never did learn to dance." },
+  { name:"Uncle Pete", meta:"1 min 3 sec · Sunday afternoon",
+    text:"Righto, quick one. Christmas 1987, the chook got into the kitchen. Not a cooked one, a live one. Mum chased it with a tea towel, Dad chased Mum, and the pudding went over. We ate toast for Christmas lunch and nobody stopped laughing long enough to complain." },
+  { name:"Mum", meta:"3 min 41 sec · Saturday morning",
+    text:"The day we moved into the first house it rained like the end of the world. The truck got bogged in the driveway, so we carried every box the last fifty metres. Your father carried the mattress on his head like a very slow, very cross snail. We had fish and chips on the floor that night and I have never been happier." },
+  { name:"Cousin Sarah", meta:"47 sec · Thursday night",
+    text:"This one's tiny but I think about it all the time. Grandad spent a whole summer teaching me to whistle. Every afternoon on the back step. When I finally got it, he acted like I'd won an Olympic medal. He told everyone at bowls. Everyone." },
+  { name:"Pop", meta:"4 min 2 sec · last Monday",
+    text:"My first car was a Holden that was more rust than car. Paid forty pounds for it and pushed it home the last mile, which should have told me something. But that car got me to the coast, to my first job, and to your grandmother's front gate. Best forty pounds I ever wasted." }
+];
+
+const PROMPTS = [
+  { text:"What's the naughtiest thing you ever did at school?", by:"suggested by Sarah" },
+  { text:"Tell us about your first job. What did it pay?", by:"suggested by Pete" },
+  { text:"Describe the kitchen of your childhood home.", by:"suggested by Katie" },
+  { text:"How did you two really meet? The true version.", by:"suggested by Mum" }
+];
+
+const feed = document.getElementById('feed');
+let speaking = null;
+
+VOICEMAILS.forEach((vm, i) => {
+  const el = document.createElement('article');
+  el.className = 'vm';
+  el.innerHTML =
+    '<div class="vm-top">' +
+      '<button class="vm-play" aria-label="Play message from ' + vm.name + '">&#9654;</button>' +
+      '<div class="vm-who"><div class="vm-name">' + vm.name + '</div>' +
+      '<div class="vm-meta">' + vm.meta + '</div></div>' +
+    '</div>' +
+    '<div class="vm-bar"><i></i></div>' +
+    '<button class="vm-toggle">Read the transcript</button>' +
+    '<div class="vm-transcript">' + vm.text + '</div>';
+  const playBtn = el.querySelector('.vm-play');
+  const bar = el.querySelector('.vm-bar i');
+  const toggle = el.querySelector('.vm-toggle');
+
+  toggle.addEventListener('click', () => {
+    el.classList.toggle('open');
+    toggle.textContent = el.classList.contains('open') ? 'Hide the transcript' : 'Read the transcript';
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (speaking && speaking.el === el) { stopSpeaking(); return; }
+    stopSpeaking();
+    if (!('speechSynthesis' in window)) {
+      el.classList.add('open');
+      toggle.textContent = 'Hide the transcript';
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(vm.text);
+    const voices = speechSynthesis.getVoices();
+    const au = voices.find(v => /en[-_]AU/i.test(v.lang)) || voices.find(v => /en[-_]GB/i.test(v.lang));
+    if (au) u.voice = au;
+    u.rate = 0.95;
+    let progress = 0;
+    const timer = setInterval(() => {
+      progress = Math.min(progress + 100 / (vm.text.length / 14), 96);
+      bar.style.width = progress + '%';
+    }, 1000);
+    u.onend = u.onerror = () => { clearInterval(timer); resetVm(el, playBtn, bar); if (speaking && speaking.el === el) speaking = null; };
+    speaking = { el, playBtn, bar, timer };
+    el.classList.add('playing');
+    playBtn.classList.add('playing');
+    playBtn.innerHTML = '&#9632;';
+    bar.style.width = '2%';
+    speechSynthesis.speak(u);
+  });
+  feed.appendChild(el);
+});
+
+function resetVm(el, btn, bar){
+  el.classList.remove('playing');
+  btn.classList.remove('playing');
+  btn.innerHTML = '&#9654;';
+  bar.style.width = '0';
+}
+function stopSpeaking(){
+  if (!speaking) return;
+  clearInterval(speaking.timer);
+  speechSynthesis.cancel();
+  resetVm(speaking.el, speaking.playBtn, speaking.bar);
+  speaking = null;
+}
+
+const promptList = document.getElementById('promptList');
+let userPrompts = [];
+try { userPrompts = JSON.parse(localStorage.getItem('memory-line-prompts')) || []; } catch(e){}
+
+function renderPrompts(){
+  promptList.innerHTML = '';
+  PROMPTS.concat(userPrompts).forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'prompt';
+    const t = document.createElement('span'); t.textContent = p.text;
+    const b = document.createElement('span'); b.className = 'by'; b.textContent = p.by;
+    d.appendChild(t); d.appendChild(b);
+    promptList.appendChild(d);
+  });
+}
+renderPrompts();
+
+document.getElementById('promptForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = document.getElementById('promptInput');
+  const text = input.value.trim();
+  if (!text) return;
+  userPrompts.push({ text, by:"suggested by you" });
+  try { localStorage.setItem('memory-line-prompts', JSON.stringify(userPrompts)); } catch(e){}
+  input.value = '';
+  renderPrompts();
+});
+</script>
+</body>
+</html>

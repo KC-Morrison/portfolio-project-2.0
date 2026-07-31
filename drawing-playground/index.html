@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Drawing Playground</title>
+  <meta name="description" content="A tiny coding playground where rectangles become Game Boy sprites. Built to draw the obstacles for Blob Runner.">
+  <link rel="canonical" href="https://kmorrison.dev/drawing-playground/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FAF5EE'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='28' fill='%23B4552D' text-anchor='middle'%3EKM%3C/text%3E%3C/svg%3E">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #1a1a2e;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #eee;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #9bbc0f;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .preview-area {
+      background: #8b956d;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .screen {
+      background: #0f380f;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      image-rendering: pixelated;
+      border-radius: 4px;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #2d4a2d;
+    }
+    .code-area {
+      background: #252540;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .code-area h2 {
+      color: #9bbc0f;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: #1a1a2e;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #9bbc0f;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 13px;
+      padding: 12px;
+      resize: vertical;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #9bbc0f;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      flex: 1;
+      background: #306230;
+      color: #9bbc0f;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #408240;
+    }
+    .help {
+      background: #252540;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .help h2 {
+      color: #9bbc0f;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .help code {
+      background: #1a1a2e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #9bbc0f;
+      font-size: 12px;
+    }
+    .color-ref {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .color-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    .chip {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+    }
+    .error {
+      color: #ff6b6b;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Pixel Drawing Playground</h1>
+    
+    <div class="preview-area">
+      <div class="screen">
+        <canvas id="canvas" width="160" height="80"></canvas>
+      </div>
+      <div class="info">
+        <span>Grid: 160 × 80 pixels</span>
+        <span>Center: x=75</span>
+      </div>
+    </div>
+    
+    <div class="code-area">
+      <h2>Your Code</h2>
+      <textarea id="code">// Draw a mushroom obstacle!
+// x and y mark the top-left corner of your drawing area
+// Try changing numbers and hit "Draw" to see what happens
+
+// Stem (x, y, width, height, color)
+pxRect(x + 5, y + 6, 4, 10, GB.dark);
+
+// Cap
+pxRect(x + 1, y, 12, 7, GB.darkest);
+
+// Cap fill
+pxRect(x + 2, y + 1, 10, 5, GB.dark);
+
+// Highlight on cap
+pxRect(x + 3, y + 2, 4, 3, GB.light);
+
+// Spots on cap
+pxRect(x + 8, y + 2, 2, 2, GB.light);</textarea>
+      <div class="error" id="error"></div>
+      <div class="buttons">
+        <button onclick="drawCode()">▶ Draw</button>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="loadExample()">Load Example</button>
+      </div>
+    </div>
+    
+    <div class="help">
+      <h2>How It Works</h2>
+      <p>Use <code>pxRect(x, y, width, height, color)</code> to draw rectangles.</p>
+      
+      <p style="margin-top: 10px;"><strong>Colors available:</strong></p>
+      <div class="color-ref">
+        <div class="color-chip">
+          <div class="chip" style="background: #0f380f;"></div>
+          GB.darkest
+        </div>
+        <div class="color-chip">
+          <div class="chip" style="background: #306230;"></div>
+          GB.dark
+        </div>
+        <div class="color-chip">
+          <div class="chip" style="background: #8bac0f;"></div>
+          GB.light
+        </div>
+        <div class="color-chip">
+          <div class="chip" style="background: #9bbc0f;"></div>
+          GB.lightest
+        </div>
+      </div>
+      
+      <p style="margin-top: 10px;"><strong>Tips:</strong></p>
+      <ul style="margin-left: 20px; margin-top: 5px;">
+        <li><code>x</code> and <code>y</code> are your starting point (already set up)</li>
+        <li>Add to x to move right, add to y to move down</li>
+        <li>Draw dark outlines first, then lighter fills on top</li>
+        <li>Keep shapes small (under 20 pixels) for pixel art look</li>
+      </ul>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:12px; color:#666; margin:22px 0;">Built to draw the obstacles for <a href="/blob-runner/" style="color:#888;">Blob Runner</a>. A personal project by <a href="https://kmorrison.dev/" style="color:#888;">Katie Morrison</a>, made with AI as a single HTML file.</p>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const GB = {
+  darkest:  '#0f380f',
+  dark:     '#306230',
+  light:    '#8bac0f',
+  lightest: '#9bbc0f'
+};
+
+function pxRect(px, py, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.floor(px), Math.floor(py), w, h);
+}
+
+function clearCanvas() {
+  ctx.fillStyle = GB.lightest;
+  ctx.fillRect(0, 0, 160, 80);
+  
+  // Draw ground
+  ctx.fillStyle = GB.darkest;
+  ctx.fillRect(0, 65, 160, 15);
+  
+  // Draw grid hint (very subtle)
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  for (let i = 0; i < 160; i += 10) {
+    ctx.fillRect(i, 0, 1, 65);
+  }
+  for (let i = 0; i < 65; i += 10) {
+    ctx.fillRect(0, i, 160, 1);
+  }
+  
+  document.getElementById('error').textContent = '';
+}
+
+function drawCode() {
+  clearCanvas();
+  
+  const code = document.getElementById('code').value;
+  const x = 70;  // Center position
+  const y = 45;  // Just above ground
+  
+  try {
+    // Create a function from the code
+    const drawFunc = new Function('pxRect', 'GB', 'x', 'y', code);
+    drawFunc(pxRect, GB, x, y);
+    document.getElementById('error').textContent = '✓ Drawing complete!';
+    document.getElementById('error').style.color = '#9bbc0f';
+  } catch (e) {
+    document.getElementById('error').textContent = 'Error: ' + e.message;
+    document.getElementById('error').style.color = '#ff6b6b';
+  }
+}
+
+const examples = [
+  `// Simple Cactus
+// Trunk
+pxRect(x + 5, y + 2, 4, 14, GB.darkest);
+pxRect(x + 6, y + 3, 2, 12, GB.dark);
+
+// Left arm
+pxRect(x, y + 5, 5, 3, GB.darkest);
+pxRect(x, y + 3, 3, 3, GB.darkest);
+pxRect(x + 1, y + 4, 1, 3, GB.dark);
+
+// Right arm
+pxRect(x + 9, y + 8, 5, 3, GB.darkest);
+pxRect(x + 11, y + 6, 3, 3, GB.darkest);
+pxRect(x + 12, y + 7, 1, 3, GB.dark);`,
+
+  `// Skull
+// Main skull
+pxRect(x + 1, y + 2, 12, 10, GB.darkest);
+pxRect(x + 2, y + 3, 10, 8, GB.light);
+
+// Eye sockets
+pxRect(x + 3, y + 4, 3, 3, GB.darkest);
+pxRect(x + 8, y + 4, 3, 3, GB.darkest);
+
+// Nose
+pxRect(x + 6, y + 7, 2, 2, GB.darkest);
+
+// Teeth
+pxRect(x + 3, y + 10, 8, 4, GB.darkest);
+pxRect(x + 4, y + 11, 2, 2, GB.light);
+pxRect(x + 8, y + 11, 2, 2, GB.light);`,
+
+  `// Slime blob
+// Body
+pxRect(x + 2, y + 6, 12, 10, GB.darkest);
+pxRect(x + 3, y + 7, 10, 8, GB.dark);
+
+// Drips
+pxRect(x, y + 10, 3, 6, GB.darkest);
+pxRect(x + 1, y + 11, 1, 4, GB.dark);
+pxRect(x + 13, y + 8, 3, 8, GB.darkest);
+pxRect(x + 14, y + 9, 1, 6, GB.dark);
+
+// Highlight
+pxRect(x + 4, y + 8, 3, 3, GB.light);
+
+// Eyes
+pxRect(x + 5, y + 10, 2, 2, GB.lightest);
+pxRect(x + 9, y + 10, 2, 2, GB.lightest);`
+];
+
+let exampleIndex = 0;
+
+function loadExample() {
+  document.getElementById('code').value = examples[exampleIndex];
+  exampleIndex = (exampleIndex + 1) % examples.length;
+  drawCode();
+}
+
+// Initial draw
+drawCode();
+</script>
+</body>
+</html>

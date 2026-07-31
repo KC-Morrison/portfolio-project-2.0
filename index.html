@@ -166,11 +166,18 @@
   .fun-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:36px;}
   @media(max-width:640px){.fun-grid{grid-template-columns:1fr;}}
   .fun-card{
-    background:var(--card);border:1px dashed var(--accent);
+    background:var(--card);border:1px solid var(--line);
     border-radius:var(--radius);padding:28px;color:var(--ink-soft);
+    transition:transform .2s, box-shadow .2s;
   }
+  .fun-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(46,40,35,.08);}
   .fun-card h3{font-size:1.15rem;margin-bottom:10px;color:var(--ink);}
-  .fun-card p{font-size:.95rem;}
+  .fun-card p{font-size:.95rem;margin-bottom:10px;}
+  .fun-card p:last-child{margin-bottom:0;}
+  .fun-card .play{
+    font-weight:700;text-decoration:none;color:var(--accent-deep);
+    border-bottom:2px solid var(--accent);padding-bottom:1px;
+  }
 
   /* ---------- writing ---------- */
   .post{
@@ -226,7 +233,7 @@
   <div class="wrap hero-grid">
     <div>
       <p class="kicker">It's nice to meet you</p>
-      <h1>I help a small charity work <em>smarter than its size</em>.</h1>
+      <h1>I help a small NFP work <em>smarter than its size</em>.</h1>
       <p class="hero-sub">I'm Katie. I look after everything operational and technical that isn't frontline work at a not-for-profit domestic violence service. I take the things that have quietly become a mess and give them a structure that holds.</p>
       <a class="btn" href="https://www.linkedin.com/in/katherine-a-morrison/" target="_blank" rel="noopener">Connect on LinkedIn</a>
       <a class="btn-ghost" href="#work">See my work ↓</a>
@@ -250,7 +257,7 @@
     <p class="section-kicker">About</p>
     <h2>The generalist holding it together</h2>
     <p>I'm the operational and technology backbone of a not-for-profit domestic violence service. I sit between leadership, frontline staff and vendors, and my job is to make sure the organisation around the frontline simply works: the systems, the sites, the contracts, the tools.</p>
-    <p>One day that means automating how a remote team books emergency accommodation. The next it's rolling out AI across the organisation, or renegotiating a fleet lease. I'm not a specialist who couldn't choose. I'm the generalist holding it all together, and in a small charity that's where one person can have an outsized impact.</p>
+    <p>One day that means automating how a remote team books emergency accommodation. The next it's rolling out AI across the organisation, or redesigning facilities maintenance processes. I'm not a specialist who couldn't choose. I'm the generalist holding it all together, and in a small NFP that's where one person can have an outsized impact.</p>
     <p><strong>Every dollar and hour I save is resource returned to the mission.</strong> I think of the work as stewardship, not admin.</p>
   </div>
 </section>
@@ -319,14 +326,43 @@
     <p class="section-kicker">For fun</p>
     <h2>Things I built because I wanted to</h2>
     <div class="fun-grid">
+
       <div class="fun-card">
-        <h3>Personal project one</h3>
-        <p>[Katie to supply: what it is, what it does, what made it fun to build, and a link or screenshot if shareable.]</p>
+        <h3>The Idea Collider</h3>
+        <p>A machine for having better ideas. It smashes together a niche audience, a hardware signal, an odd output medium and one awkward constraint, then makes you argue <em>for</em> the weird result before you're allowed to judge it. I built it with AI because my brainstorms kept landing on predictable ideas. They don't any more.</p>
+        <p><a class="play" href="/collider/">Roll a collision</a></p>
       </div>
+
       <div class="fun-card">
-        <h3>Personal project two</h3>
-        <p>[Katie to supply: same again. A couple of lines is plenty.]</p>
+        <h3>A voicemail line for family stories</h3>
+        <p>Call a phone number, leave a memory, and it appears on a website that collects the lot. Built so the least technical people in my family could preserve their stories through the one interface everyone already knows: leaving a voicemail.</p>
+        <p><a class="play" href="/memory-line/">See how it works</a></p>
       </div>
+
+      <div class="fun-card">
+        <h3>HOULP! looks after my house</h3>
+        <p>A home maintenance app I built as a single HTML file. It knows every job the house needs and when, and it works entirely offline. Now I'm giving it a body: a palm-sized hardware companion, a tamagotchi for the house, that droops when the gutters are overdue.</p>
+        <p><a class="play" href="/houlp/">Meet it</a></p>
+      </div>
+
+      <div class="fun-card">
+        <h3>My Gym Coach</h3>
+        <p>A pocket workout tracker built with AI in a single HTML file: my whole program with instructions, personal bests, a streak dot per exercise, and Pebble, the accountability pet rock. It nags me exactly as much as a rock can.</p>
+        <p><a class="play" href="/gym-coach/">Train with it</a></p>
+      </div>
+
+      <div class="fun-card">
+        <h3>Blob Runner, Game Boy edition</h3>
+        <p>An endless runner in the original Game Boy's four shades of green: one blob, one button, and obstacles drawn pixel by pixel. Made with AI for no reason except that games are fun. Tap or press space to jump.</p>
+        <p><a class="play" href="/blob-runner/">Play it</a></p>
+      </div>
+
+      <div class="fun-card">
+        <h3>The pixel sprite lab</h3>
+        <p>The game needed obstacles, so I built the tool that draws them: a tiny coding playground where rectangles become Game Boy sprites, in the same four greens. Change the numbers and watch the mushroom change.</p>
+        <p><a class="play" href="/drawing-playground/">Draw something</a></p>
+      </div>
+
     </div>
   </div>
 </section>
@@ -365,7 +401,7 @@
 <section class="contact" id="contact">
   <div class="wrap">
     <h2>Let's talk</h2>
-    <p>If you're building something in the not-for-profit or community services sector and need someone who can make the operational and technical side hold together, I'd love to hear from you.</p>
+    <p>I'm always looking to build my network so if you think we'd have interesting conversations, I'd love to hear from you.</p>
     <a class="btn" href="https://www.linkedin.com/in/katherine-a-morrison/" target="_blank" rel="noopener">Connect on LinkedIn</a>
   </div>
 </section>
