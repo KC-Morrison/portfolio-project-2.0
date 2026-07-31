@@ -24,7 +24,14 @@ Everything here needs input from Katie. Slot content in without changing structu
 1. **Photo.** DONE: hero photo in place as `katie.webp` (800x800 square) with `katie.jpg` fallback, EXIF stripped, `fetchpriority="high"`, alt text with no employer reference. Source file is `assets/source/BINADW KM 7.jpg` (5371x3581) if recrops are ever needed.
 2. **Personal projects.** Replace the two dashed `.fun-card` placeholders with real content: what it is, what it does, what made it fun, plus a link or screenshot if shareable. Remove the dashed border once real (it signals "placeholder").
 3. **Case study.** Replace the drafted Claude + Obsidian article in the `<details class="post">` body with Katie's own write-up. Check it for identifying details before publishing.
-4. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
+4. **Work card accuracy review.** Katie raised that the selected-work cards overstated her contribution on work where she was a contributor rather than the owner. Pass done 31 Jul 2026:
+   - Card 02 changed from digital business cards to digital staff ID cards, with credit split honestly (her proposal, external agency refined the design, her rollout). The old closing line "This site works the same way: scan, read, connect" was dropped with it, since the QR tie-in no longer applies.
+   - Old card 03 (Starlink, 930 km from Sydney) **removed**: the research was done but the organisation did not proceed, so it was not a delivered outcome. Replaced in slot 03 by the contractor spend tracker.
+   - About section: the "satellite internet for a property 900 kilometres from Sydney" example was swapped for the crisis accommodation booking automation, for the same reason.
+   - Card 01 reviewed by Katie and confirmed accurate. No change.
+   - Card 04 rewritten. It previously claimed she led the network upgrade and owned it "end to end" including quotes and vendor negotiation. In fact her manager set the project up and handles commercials; Katie is deputy, covering the on-site audit, staff coordination, day to day vendor contact and the incumbent IT provider handover. Tag changed from "Project lead" to "Coordination".
+   - **Accuracy review now complete** for all four cards. Re-check any card whose underlying project changes.
+5. **Email decision.** Currently omitted deliberately (her work domain identifies the employer). If she supplies a personal or custom-domain address, add it to the contact section as a secondary action, styled like `.btn-ghost` in cream. Consider an obfuscation approach (JS-assembled mailto) to limit scraping.
 
 **Acceptance:** no bracketed `[Katie to supply]` text remains anywhere on the page.
 
@@ -73,3 +80,4 @@ Everything here needs input from Katie. Slot content in without changing structu
 - Test at 360px, 768px and 1200px widths; the audience scans this on phones on conference wifi.
 - After every iteration, re-run the three checks: no em dashes in copy, no US spellings in copy (CSS keywords excepted), no employer identifiers anywhere.
 - When in doubt on tone, cut words rather than add them.
+- Card 03 (contractor spend tracker) deliberately names neither the contractor nor the sites. The site labels on those invoices are employer identifiers, so keep them out if the card is ever expanded into a case study.
